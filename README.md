@@ -20,13 +20,13 @@ Welcome to the Landsat App! This application allows users to explore and analyze
     ```
 3. Install dependencies:
     ```sh
-    npm install
+    yarn
     ```
 
 ## Usage
 
 Start the application:
 ```sh
-npm start
+yarn run start
 ```
 Open your browser and go to `http://localhost:3000` to use the app.
