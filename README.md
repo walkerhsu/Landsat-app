@@ -22,6 +22,10 @@ Welcome to the Landsat App! This application allows users to explore and analyze
     ```sh
     yarn
     ```
+4. Create a `.env.local` file in the root directory and add the following:
+    ```sh
+    NEXT_PUBLIC_MAPBOX_TOKEN=<your_mapbox_token>
+    ```
 
 ## Usage
 
