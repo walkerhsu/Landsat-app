@@ -1,13 +1,13 @@
 'use client';
 
 import { useSearchParams } from 'next/navigation';
-import styles from './main.module.css';
+import styles from '../styles/main.module.css';
 
 export default function MainContent() {
   const searchParams = useSearchParams();
-  const username = searchParams.get('username');
-  const lat = searchParams.get('lat');
-  const lng = searchParams.get('lng');
+  const username = searchParams?.get('username');
+  const lat = searchParams?.get('lat');
+  const lng = searchParams?.get('lng');
 
   return (
     <div className={styles.mainPage}>

@@ -1,7 +1,7 @@
 'use client';
 
 import { Suspense } from 'react';
-import MainContent from './MainContent';
+import MainContent from '../components/mainContent';
 
 export default function MainPage() {
   return (
