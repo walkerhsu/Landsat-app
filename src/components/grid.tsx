@@ -15,6 +15,7 @@ const GridComponent: React.FC = () => {
       .attr('width', 300)
       .attr('height', 300);
 
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const rects = svg.selectAll('rect')
       .data(gridItems)
       .enter()
@@ -26,6 +27,8 @@ const GridComponent: React.FC = () => {
       .attr('fill', d => d.color)
       .style('cursor', 'pointer')
       .on('click', (_, d) => setSelectedDescription(d.description));
+
+
   }, [gridItems]);
 
   return (

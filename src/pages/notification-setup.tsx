@@ -9,7 +9,7 @@ const NotificationSettingsForm: React.FC<Props> = ({ onSubmit }) => {
     const [notificationMethod, setNotificationMethod] = useState('');
     const [location, setLocation] = useState('');
 
-    const handleSubmit = (e: any) => {
+    const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
         onSubmit({ leadTime, notificationMethod, location });
     };

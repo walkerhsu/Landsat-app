@@ -11,3 +11,25 @@
   border-radius: 8px;
   margin-top: 2rem;
 }
+
+.drawerToggle {
+  position: fixed;
+  top: 20px;
+  left: 20px;
+  background-color: #0070f3;
+  color: white;
+  border: none;
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  cursor: pointer;
+  z-index: 1001;
+  transition: background-color 0.2s ease-in-out;
+}
+
+.drawerToggle:hover {
+  background-color: #0051a2;
+}

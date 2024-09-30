@@ -1,0 +1,70 @@
+.drawer {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 250px;
+  height: 100%;
+  background-color: #e6f3ff;
+  box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
+  transition: transform 0.3s ease-in-out;
+  transform: translateX(-230px);
+  z-index: 1000;
+}
+
+.drawer.open {
+  transform: translateX(0);
+}
+
+.toggleButton {
+  position: absolute;
+  top: 20px;
+  right: -20px;
+  width: 40px;
+  height: 40px;
+  background-color: #c4e0fa;
+  color: white;
+  border: none;
+  border-radius: 0 50% 50% 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  cursor: pointer;
+  transition: background-color 0.2s ease-in-out;
+}
+
+.toggleButton:hover {
+  background-color: #64b1fd;
+}
+
+.open .toggleButton {
+  transform: rotate(180deg) ;
+  right: 0;
+  border-radius: 0 50% 50% 0;
+}
+
+.drawerContent {
+  padding: 60px 20px 20px;
+}
+
+.drawerItem {
+  display: block;
+  padding: 10px 0;
+  font-size: 18px;
+  color: #333;
+  text-decoration: none;
+  transition: color 0.2s ease-in-out;
+}
+
+.drawerItem:hover {
+  color: #0070f3;
+}
+
+.overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  z-index: 999;
+}

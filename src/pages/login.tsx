@@ -2,7 +2,7 @@ import React, { useState } from 'react'
 import styles from '../styles/login.module.css'
 // import { useNavigate } from 'react-router-dom'
 
-const Login = (props) => {
+const Login = () => {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [emailError, setEmailError] = useState('')
