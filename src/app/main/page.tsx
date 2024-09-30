@@ -1,10 +1,10 @@
-'use client';
+"use client";
 
-import { Suspense, useState } from 'react';
+import { Suspense, useState } from "react";
 // import { useSearchParams } from 'next/navigation';
-import styles from '../styles/main.module.css';
-import Mapbox from '@/components/mapbox';
-import Drawer from '@/components/drawer';
+import styles from "@/styles/main.module.css";
+import Mapbox from "@/components/mapbox";
+import Drawer from "@/components/drawer";
 
 const MainContent = () => {
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
@@ -22,7 +22,7 @@ const MainContent = () => {
       <Mapbox />
     </div>
   );
-}
+};
 
 export default function MainPage() {
   return (
