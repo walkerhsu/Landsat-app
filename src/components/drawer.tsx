@@ -18,7 +18,7 @@ const Drawer: React.FC<DrawerProps> = ({ isOpen, onToggle }) => {
       </button>
       <div className={styles.drawerContent}>
         <Link href="/report" className={styles.drawerItem}>Report</Link>
-        <Link href="/settings" className={styles.drawerItem}>Settings</Link>
+        <Link href="/profile" className={styles.drawerItem}>Profile</Link>
       </div>
       </div>
       {isOpen && <div className={styles.overlay} onClick={onToggle}></div>}
