@@ -1,106 +1,98 @@
-'use client';
+"use client";
 
 import React, { useState } from "react";
-import Image from 'next/image';
 import styles from "../../styles/profile.module.css";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faEnvelope, faLock, faPencilAlt } from "@fortawesome/free-solid-svg-icons";
+import { faPencilAlt } from "@fortawesome/free-solid-svg-icons";
+import ProfileView from "./profileView";
+import ProfileEditForm from "./profileEditForm";
+import MapModal from "./mapModal";
+import { IProfile, TLocation } from "@/types";
 
 const ProfilePage = () => {
-  const [name, setName] = useState("John Doe");
-  const [email, setEmail] = useState("john.doe@example.com");
-  const [password, setPassword] = useState("********");
-  const [editField, setEditField] = useState<string | null>(null);
-  const [tempEmail, setTempEmail] = useState("");
-  const [tempPassword, setTempPassword] = useState("");
-  const [tempName, setTempName] = useState("");
-  const handleEdit = (field: string) => {
-    setEditField(field);
-    if (field === "email") setTempEmail(email);
-    if (field === "password") setTempPassword("");
-    if (field === "name") setTempName(name);
-  };
+  const [profile, setProfile] = useState<IProfile>({
+    name: "John Doe",
+    email: "john.doe@example.com",
+    password: "********",
+    favoriteLocations: [
+      { lat: 40.7128, lng: -74.006 },
+      { lat: 34.0522, lng: -118.2437 },
+      { lat: 72.1724, lng: 37.3333 },
+    ],
+    favoriteTopics: ["water", "landscape"],
+  });
 
-  const handleSave = () => {
-    if (editField === "email") setEmail(tempEmail);
-    if (editField === "password") setPassword(tempPassword);
-    if (editField === "name") setName(tempName);
-    setEditField(null);
-  };
+  const [isEditing, setIsEditing] = useState(false);
+  const [showMap, setShowMap] = useState(false);
+  const [selectedLocation, setSelectedLocation] = useState<TLocation | null>(
+    null
+  );
+  const [editedProfile, setEditedProfile] = useState<IProfile>({ ...profile });
 
+  const handleEdit = () => setIsEditing(true);
+  const handleSave = (editedProfile: IProfile) => {
+    setProfile(editedProfile);
+    setIsEditing(false);
+    setShowMap(false);
+  };
   const handleCancel = () => {
-    setEditField(null);
-    setTempEmail("");
-    setTempPassword("");
+    setIsEditing(false);
+    setShowMap(false);
+  };
+  const handleMapClose = () => {
+    setSelectedLocation(null);
+    setShowMap(false);
+  };
+
+  const handleMapConfirm = () => {
+    if (selectedLocation) {
+      console.log("selectedLocation", selectedLocation);
+      setEditedProfile((prev) => ({
+        ...prev,
+        favoriteLocations: [selectedLocation, ...prev.favoriteLocations],
+      }));
+    }
+    setShowMap(false);
   };
 
   return (
-    <div className={styles.bookContainer}>
-      <div className={styles.book}>
-        <div className={styles.pages}>
-          <div className={`${styles.page} ${styles.leftPage}`}>
-            <div className={styles.profileHeader}>
-              <div className={styles.profileImageContainer}>
-                <Image
-                  src="/default_profile.jpg" // Replace with actual image path
-                  alt="Profile"
-                  width={80}
-                  height={80}
-                  className={styles.profileImage}
-                />
-              </div>
-              <h2 className={styles.profileName}>{name}</h2>
-              <FontAwesomeIcon 
-                icon={faPencilAlt} 
-                className={styles.editIcon} 
-                onClick={() => handleEdit("name")}
-              />
-            </div>
-            <div className={styles.profileInfo}>
-              <FontAwesomeIcon icon={faEnvelope} className={styles.icon} />
-              <span>{email}</span>
-              <FontAwesomeIcon 
-                icon={faPencilAlt} 
-                className={styles.editIcon} 
-                onClick={() => handleEdit("email")}
-              />
-            </div>
-            <div className={styles.profileInfo}>
-              <FontAwesomeIcon icon={faLock} className={styles.icon} />
-              <span>{password}</span>
-              <FontAwesomeIcon 
-                icon={faPencilAlt} 
-                className={styles.editIcon} 
-                onClick={() => handleEdit("password")}
-              />
-            </div>
-          </div>
-          <div className={`${styles.page} ${styles.rightPage}`}>
-            {editField && (
-              <div className={styles.editField}>
-                <h3>Edit {editField}</h3>
-                <input
-                  className={styles.input}
-                  type={editField === "password" ? "password" : "text"}
-                  value={editField === "email" ? tempEmail : editField === "name" ? tempName : tempPassword}
-                  onChange={(e) => {
-                    if (editField === "email") setTempEmail(e.target.value);
-                    else if (editField === "name") setTempName(e.target.value);
-                    else setTempPassword(e.target.value);
-                  }}
-                />
-                <div className={styles.buttonGroup}>
-                  <button className={styles.button} onClick={handleSave}>
-                    Save
-                  </button>
-                  <button className={`${styles.button} ${styles.cancelButton}`} onClick={handleCancel}>
-                    Cancel
-                  </button>
-                </div>
-              </div>
-            )}
-          </div>
-        </div>
+    <div className={styles.profilePage}>
+      <div className={styles.fixedHeader}>
+        <h1 className={styles.title}>
+          {isEditing ? "Editing your profile" : "Your Profile"}
+        </h1>
+        {!isEditing && (
+          <button className={styles.editButton} onClick={handleEdit}>
+            <FontAwesomeIcon icon={faPencilAlt} /> Edit Profile
+          </button>
+        )}
+      </div>
+
+      <div
+        className={`${styles.contentContainer} ${
+          showMap ? styles.withMap : ""
+        }`}
+      >
+        {!isEditing ? (
+          <ProfileView profile={profile} />
+        ) : (
+          <>
+            <ProfileEditForm
+              editedProfile={editedProfile}
+              setEditedProfile={setEditedProfile}
+              onSave={handleSave}
+              onCancel={handleCancel}
+              onShowMap={() => setShowMap(true)}
+            />
+            <MapModal
+              show={showMap}
+              onClose={handleMapClose}
+              onConfirm={handleMapConfirm}
+              selectedLocation={selectedLocation}
+              onLocationSelect={setSelectedLocation}
+            />
+          </>
+        )}
       </div>
     </div>
   );

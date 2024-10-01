@@ -5,12 +5,12 @@ import "react-map-gl-geocoder/dist/mapbox-gl-geocoder.css";
 import { useCallback, useRef, useState } from "react";
 // import { useRouter } from 'next/navigation';
 import { MapRef, Marker } from "react-map-gl";
-import styles from "../styles/login.module.css";
+import styles from "@/components/styles/mapbox.module.css";
 import { MapMouseEvent } from "mapbox-gl";
 import MapGL from "react-map-gl";
 import mapboxgl from "mapbox-gl";
 import MapboxGeocoder from "@mapbox/mapbox-gl-geocoder";
-
+import { TLocation } from "../types";
 const MAPBOX_TOKEN = process.env.NEXT_PUBLIC_MAPBOX_TOKEN!;
 
 type Viewport = {
@@ -19,11 +19,15 @@ type Viewport = {
   zoom: number | undefined;
 };
 
-export default function Mapbox() {
-  const [location, setLocation] = useState({ lat: 0, lng: 0 });
+interface IMapboxProps {
+  location: TLocation | null;
+  onLocationSelect: (location: TLocation) => void;
+}
+
+export default function Mapbox({ location, onLocationSelect }: IMapboxProps) {
+  // const [location, setLocation] = useState({ lat: 0, lng: 0 });
   // const [mapInstance, setMapInstance] = useState<MapRef | null>(null);
   const [showMarker, setShowMarker] = useState<boolean>(false);
-  // const [showMap, setShowMap] = useState(true);
 
   const [viewport, setViewport] = useState({
     latitude: 25.13680057687235,
@@ -55,13 +59,14 @@ export default function Mapbox() {
   const handleMapClick = (event: MapMouseEvent) => {
     const { lng, lat } = event.lngLat;
     // const { x: cursorX, y: cursorY } = event.point;
-    setLocation({ lat, lng });
+    // setLocation({ lat, lng });
     handleViewportChange({
       latitude: lat,
       longitude: lng,
       zoom: 16,
     });
     setShowMarker(true);
+    onLocationSelect({ lat, lng });
     // setShowMap(false);
   };
   const handleMapLoad = () => {
@@ -81,31 +86,28 @@ export default function Mapbox() {
   };
 
   return (
-    <>
-      {/* <div>{MAPBOX_TOKEN}</div> */}
-      <div className={styles.mapOverlay}>
-        <div className={styles.mapContainer}>
-          {
-            <MapGL
-              ref={mapRef}
-              mapboxAccessToken={MAPBOX_TOKEN}
-              initialViewState={viewport}
-              style={{ height: "30vw", width: "50vw" }}
-              mapStyle="mapbox://styles/mapbox/standard-satellite"
-              onClick={handleMapClick}
-              onLoad={handleMapLoad}
-            >
-              {showMarker && (
-                <Marker
-                  longitude={location.lng}
-                  latitude={location.lat}
-                  color="red"
-                />
-              )}
-            </MapGL>
-          }
-        </div>
+    // <div className={styles.mapOverlay}>
+      <div className={styles.mapContainer}>
+        {
+          <MapGL
+            ref={mapRef}
+            mapboxAccessToken={MAPBOX_TOKEN}
+            initialViewState={viewport}
+            style={{ height: "30vw", width: "50vw" }}
+            mapStyle="mapbox://styles/mapbox/standard-satellite"
+            onClick={handleMapClick}
+            onLoad={handleMapLoad}
+          >
+            {showMarker && location && (
+              <Marker
+                longitude={location.lng}
+                latitude={location.lat}
+                color="red"
+              />
+            )}
+          </MapGL>
+        }
       </div>
-    </>
+    // </div>
   );
 }
