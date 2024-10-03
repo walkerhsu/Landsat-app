@@ -3,7 +3,6 @@
 import "mapbox-gl/dist/mapbox-gl.css";
 import "react-map-gl-geocoder/dist/mapbox-gl-geocoder.css";
 import { useCallback, useRef, useState } from "react";
-// import { useRouter } from 'next/navigation';
 import { MapRef, Marker } from "react-map-gl";
 import styles from "@/components/styles/mapbox.module.css";
 import { MapMouseEvent } from "mapbox-gl";
@@ -11,6 +10,7 @@ import MapGL from "react-map-gl";
 import mapboxgl from "mapbox-gl";
 import MapboxGeocoder from "@mapbox/mapbox-gl-geocoder";
 import { TLocation } from "../types";
+
 const MAPBOX_TOKEN = process.env.NEXT_PUBLIC_MAPBOX_TOKEN!;
 
 type Viewport = {
@@ -67,7 +67,6 @@ export default function Mapbox({ location, onLocationSelect }: IMapboxProps) {
     });
     setShowMarker(true);
     onLocationSelect({ lat, lng });
-    // setShowMap(false);
   };
   const handleMapLoad = () => {
     // setMapInstance(map);
@@ -78,36 +77,37 @@ export default function Mapbox({ location, onLocationSelect }: IMapboxProps) {
           mapboxgl: mapboxgl,
           marker: true,
           zoom: viewport.zoom,
+          placeholder: 'Search for a location',
         }),
-        "top-left"
+        "top-right"
       );
-      mapRef.current.addControl(new mapboxgl.NavigationControl());
+      mapRef.current.addControl(new mapboxgl.NavigationControl(), 'right');
     }
   };
 
   return (
     // <div className={styles.mapOverlay}>
-      <div className={styles.mapContainer}>
-        {
+      // <div className={styles.mapContainer}>
+        // {
           <MapGL
             ref={mapRef}
             mapboxAccessToken={MAPBOX_TOKEN}
             initialViewState={viewport}
-            style={{ height: "30vw", width: "50vw" }}
+            // style={{ height: "60vh", width: "90vw" }}
             mapStyle="mapbox://styles/mapbox/standard-satellite"
             onClick={handleMapClick}
             onLoad={handleMapLoad}
           >
             {showMarker && location && (
               <Marker
-                longitude={location.lng}
-                latitude={location.lat}
+                longitude={viewport.longitude}
+                latitude={viewport.latitude}
                 color="red"
               />
             )}
           </MapGL>
-        }
-      </div>
+        // }
+      // </div>
     // </div>
   );
 }
