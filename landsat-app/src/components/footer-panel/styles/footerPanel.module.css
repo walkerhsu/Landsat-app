@@ -1,0 +1,54 @@
+.footerPanel {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background-color: var(--dark-blue);
+  opacity: 0.85;
+  border-top: 2px solid #ccc;
+  box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.2);
+  padding: 16px;
+  cursor: grab;
+  z-index: 1000;
+  height: 20vh;
+  overflow-y: auto; /* Allow scrolling if content overflows */
+  transition: height 0.3s ease;
+}
+
+.panelContent {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.statistics {
+  color: #000000;
+  margin-bottom: 16px;
+}
+
+.statistics p {
+  margin: 0;
+  font-size: 16px;
+}
+
+.graphContainer {
+  width: 100%;
+  max-width: 600px; /* Adjust the graph width */
+  margin-bottom: 16px;
+}
+
+.collapsed {
+  height: 40px; /* Collapsed height */
+}
+
+.toggleButton {
+  position: absolute;
+  top: 5px;
+  right: 20px;
+  background-color: var(--dark-blue);;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  padding: 8px;
+  cursor: pointer;
+}

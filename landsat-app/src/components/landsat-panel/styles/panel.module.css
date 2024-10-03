@@ -1,0 +1,67 @@
+.panel {
+  width: 100%;
+  max-width: 320px;
+  background-color: rgba(40, 40, 40, 0.85);
+  /* border: 1px solid #ccc; */
+  border-radius: 8px;
+  padding: 16px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.tabs {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 16px;
+}
+
+.tabButton {
+  flex-grow: 1;
+  padding: 8px;
+  border: none;
+  cursor: pointer;
+  text-align: center;
+  font-weight: bold;
+}
+
+.tabButton.active {
+  background-color: var(--dark-blue);
+  color: white;
+}
+
+.content {
+  margin-bottom: 16px;
+}
+
+.item {
+  margin-bottom: 12px;
+}
+
+.item h4 {
+  margin: 0;
+}
+
+.item p {
+  margin: 4px 0;
+  color: #555;
+}
+
+.option {
+  display: block;
+  margin-left: 16px;
+  cursor: pointer;
+}
+
+.footer {
+  display: flex;
+  justify-content: center;
+}
+
+.downloadButton {
+  background-color: #e03a3e;
+  color: white;
+  padding: 10px;
+  border: none;
+  cursor: pointer;
+  font-size: 14px;
+  border-radius: 4px;
+}

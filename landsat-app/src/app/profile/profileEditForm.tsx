@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import styles from "../../styles/profile.module.css";
+import styles from "./profile.module.css";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCirclePlus, faCircleMinus } from "@fortawesome/free-solid-svg-icons";
 import { AddTopicSelect } from "../../components/topic_selector";
