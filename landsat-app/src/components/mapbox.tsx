@@ -2,14 +2,19 @@
 
 import "mapbox-gl/dist/mapbox-gl.css";
 import "react-map-gl-geocoder/dist/mapbox-gl-geocoder.css";
-import { useCallback, useRef, useState } from "react";
-import { MapRef, Marker } from "react-map-gl";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { Layer, MapRef, Marker, Source } from "react-map-gl";
 import styles from "@/components/styles/mapbox.module.css";
 import { MapMouseEvent } from "mapbox-gl";
 import MapGL from "react-map-gl";
 import mapboxgl from "mapbox-gl";
 import MapboxGeocoder from "@mapbox/mapbox-gl-geocoder";
 import { TLocation } from "../types";
+import { dataLayer } from "./map-style";
+import { useSelector } from "react-redux";
+import { RootState } from "@/app/redux/store";
+import { GeoJson } from "@/app/redux/selectedDataset-slice";
+import { mockGeoJson } from "./map-geojson";
 
 const MAPBOX_TOKEN = process.env.NEXT_PUBLIC_MAPBOX_TOKEN!;
 
@@ -20,22 +25,31 @@ type Viewport = {
 };
 
 interface IMapboxProps {
-  location: TLocation | null;
+  location: TLocation;
   onLocationSelect: (location: TLocation) => void;
 }
 
 export default function Mapbox({ location, onLocationSelect }: IMapboxProps) {
-  // const [location, setLocation] = useState({ lat: 0, lng: 0 });
-  // const [mapInstance, setMapInstance] = useState<MapRef | null>(null);
+  const selectedDataset = useSelector(
+    (state: RootState) => state.selectedDataset
+  );
   const [showMarker, setShowMarker] = useState<boolean>(false);
 
   const [viewport, setViewport] = useState({
-    latitude: 25.13680057687235,
-    longitude: 121.50427011487547,
+    latitude: location.lat,
+    longitude: location.lng,
     zoom: 15,
   });
   const mapRef = useRef<MapRef | null>(null);
   // const geocoderContainerRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    handleViewportChange({
+      latitude: location.lat,
+      longitude: location.lng,
+      zoom: 15,
+    });
+  }, [location]);
 
   const handleViewportChange = useCallback(
     (newViewport: Viewport) => {
@@ -77,37 +91,70 @@ export default function Mapbox({ location, onLocationSelect }: IMapboxProps) {
           mapboxgl: mapboxgl,
           marker: true,
           zoom: viewport.zoom,
-          placeholder: 'Search for a location',
+          placeholder: "Search for a location",
         }),
         "top-right"
       );
-      mapRef.current.addControl(new mapboxgl.NavigationControl(), 'right');
+      mapRef.current.addControl(new mapboxgl.NavigationControl(), "right");
     }
   };
+  const [allData, setAllData] = useState<GeoJson[] | null>(null);
+
+  const data = useMemo(() => {
+    // console.log(mockGeoJson);
+    return allData;
+    // return [mockGeoJson];
+  }, [allData]);
+
+  // const fetchGeoJson = async () => {
+  //   try {
+  //     const response = await fetch(
+  //       'https://raw.githubusercontent.com/uber/react-map-gl/master/examples/.data/us-income.geojson'
+  //     );
+  //     const json = await response.json();
+  //     setAllData(json);
+  //   } catch (error) {
+  //     console.error('Could not load data', error);
+  //   }
+  // }
+
+  useEffect(() => {
+    // console.log(selectedDataset);
+    // console.log(selectedDataset.locations.map((loc) => loc.geoJsons));
+    setAllData(selectedDataset.locations.map((loc) => loc.geoJsons));
+    // setAllData([mockGeoJson]);
+    // fetchGeoJson();
+  }, [selectedDataset]);
 
   return (
     // <div className={styles.mapOverlay}>
-      // <div className={styles.mapContainer}>
-        // {
-          <MapGL
-            ref={mapRef}
-            mapboxAccessToken={MAPBOX_TOKEN}
-            initialViewState={viewport}
-            // style={{ height: "60vh", width: "90vw" }}
-            mapStyle="mapbox://styles/mapbox/standard-satellite"
-            onClick={handleMapClick}
-            onLoad={handleMapLoad}
-          >
-            {showMarker && location && (
-              <Marker
-                longitude={viewport.longitude}
-                latitude={viewport.latitude}
-                color="red"
-              />
-            )}
-          </MapGL>
-        // }
-      // </div>
+    // <div className={styles.mapContainer}>
+    // {
+    <MapGL
+      ref={mapRef}
+      mapboxAccessToken={MAPBOX_TOKEN}
+      initialViewState={viewport}
+      // style={{ height: "60vh", width: "90vw" }}
+      mapStyle="mapbox://styles/mapbox/standard-satellite"
+      onClick={handleMapClick}
+      onLoad={handleMapLoad}
+    >
+      {data?.map((item, index) => (
+        <Source key={index} type="geojson" data={item}>
+          <Layer {...dataLayer} />
+        </Source>
+      ))}
+
+      {showMarker && location && (
+        <Marker
+          longitude={viewport.longitude}
+          latitude={viewport.latitude}
+          color="red"
+        />
+      )}
+    </MapGL>
+    // }
+    // </div>
     // </div>
   );
 }

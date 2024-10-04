@@ -1,6 +1,10 @@
 :root {
   --dark-gray: rgba(40, 40, 40, 0.85);
   --dark-blue: #202432;
+  --steel-blue: #4B5563;
+  --steel-gray: rgba(70, 70, 70, 0.85);
+  --pink: #E75480;
+  --dark-pink: #C93667;
   --white: #000000;
 }
 

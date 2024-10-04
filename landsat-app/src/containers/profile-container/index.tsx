@@ -1,9 +1,17 @@
 "use client";
 
 import React, { useState } from "react";
+import { useSelector, useDispatch } from "react-redux";
+import { RootState } from "@/app/redux/store";
+import {
+  removeLocation,
+  updateAddressField,
+  updateDetailField,
+  updatePersonField,
+} from "@/app/redux/person-slice";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
-import { MoreVertical, MapPin, Mail, Phone } from "lucide-react";
+import { MapPin, Mail, Phone } from "lucide-react";
 import {
   Tabs,
   TabsList,
@@ -12,11 +20,12 @@ import {
 } from "@/components/magicui/tabs";
 import { Card, CardContent } from "@/components/magicui/card";
 import { Input } from "@/components/magicui/input";
-import { Person } from "./info";
+import { Person } from "../../app/redux/info";
 import { LsIconName } from "@/constants/ls-icon";
-import { LsIcon } from "../LsIcon";
-import { LsText } from "../LsText";
+import { LsIcon } from "../../components/LsIcon";
+import { LsText } from "../../components/LsText";
 import { LsFontFamily, LsFontSize, LsFontWeight } from "@/constants/ls-fonts";
+import { useClerk } from "@clerk/nextjs";
 
 const tabs = [
   { id: "overview", label: "Overview" },
@@ -28,51 +37,55 @@ type Props = {
 };
 
 const PersonProfile: React.FC<Props> = ({ currentTab }) => {
+  const { signOut } = useClerk();
   const router = useRouter();
+  const dispatch = useDispatch();
+  const editablePerson = useSelector((state: RootState) => state.person); // Accessing editablePerson from Redux
+
   const [isEditing, setIsEditing] = useState(false);
-  const [editablePerson, setEditablePerson] = useState<Person>(Person);
+  // const [editablePerson, setEditablePerson] = useState<Person>(Person);
 
   const handleEditClick = () => {
     setIsEditing(!isEditing);
   };
 
-  const handleDeleteLocation = React.useCallback(
-    (locationToDelete: string) => {
-      setEditablePerson((prevPerson) => ({
-        ...prevPerson,
-        locationHistory: prevPerson.locationHistory.filter(
-          (location) => location.place !== locationToDelete
-        ),
-      }));
-    },
-    []
-  );
+  const handleDeleteLocation = React.useCallback((locationToDelete: string) => {
+    dispatch(removeLocation(locationToDelete));
+    // setEditablePerson((prevPerson) => ({
+    //   ...prevPerson,
+    //   locationHistory: prevPerson.locationHistory.filter(
+    //     (location) => location.place !== locationToDelete
+    //   ),
+    // }));
+  }, []);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    setEditablePerson((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
+    dispatch(updatePersonField({ field: name as keyof Person, value: value }));
+    // setEditablePerson((prev) => ({
+    //   ...prev,
+    //   [name]: value,
+    // }));
   };
 
   const handleAddressChange = (e) => {
     const { name, value } = e.target;
-    setEditablePerson((prev) => ({
-      ...prev,
-      address: { ...prev.address, [name]: value },
-    }));
+    dispatch(updateAddressField({ name: name, value: value }));
+    // setEditablePerson((prev) => ({
+    //   ...prev,
+    //   address: { ...prev.address, [name]: value },
+    // }));
   };
 
   const handleDetailsChange = (e) => {
     const { name, value } = e.target;
-
-    setEditablePerson((prev) => ({
-      ...prev,
-      details: prev.details.map((detail) =>
-        detail.label === name ? { ...detail, field: value } : detail
-      ),
-    }));
+    dispatch(updateDetailField({ name: name, value: value }));
+    // setEditablePerson((prev) => ({
+    //   ...prev,
+    //   details: prev.details.map((detail) =>
+    //     detail.label === name ? { ...detail, field: value } : detail
+    //   ),
+    // }));
   };
 
   const handleTabChange = (value: string) => {
@@ -82,7 +95,10 @@ const PersonProfile: React.FC<Props> = ({ currentTab }) => {
     <div className="w-full mx-auto p-6 bg-black text-gray-100 min-h-screen">
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-2xl font-semibold text-white">Profile</h1>
-        <button className="bg-black hover:bg-gray-700 text-white px-4 py-2 rounded-md flex gap-2">
+        <button
+          className="bg-black hover:bg-gray-700 text-white px-4 py-2 rounded-md flex gap-2"
+          onClick={() => signOut({ redirectUrl: "/" })}
+        >
           <LsIcon name={LsIconName.Logout} />
           <LsText>Logout</LsText>
         </button>
@@ -296,37 +312,39 @@ const PersonProfile: React.FC<Props> = ({ currentTab }) => {
                         </tr>
                       </thead>
                       <tbody>
-                        {editablePerson.locationHistory.map((location, index) => (
-                          <tr
-                            key={index}
-                            className="border-b border-gray-700 last:border-b-0"
-                          >
-                            <td className="px-6 py-4 text-gray-300">
-                              {location.place}
-                            </td>
-                            <td className="px-6 py-4 text-gray-300">
-                              {location.latlng.lat.toString() +
-                                ", " +
-                                location.latlng.lng.toString()}
-                            </td>
-                            <td className="px-6 py-4 text-gray-300">
-                              {location.dataset}
-                            </td>
-                            <td className="px-6 py-4 text-gray-300">
-                              {location.addedDate}
-                            </td>
-                            <td className="px-6 py-4">
-                              <button
-                                className="text-gray-400 hover:text-gray-300"
-                                onClick={() =>
-                                  handleDeleteLocation(location.place)
-                                }
-                              >
-                                <LsIcon name={LsIconName.Delete} />
-                              </button>
-                            </td>
-                          </tr>
-                        ))}
+                        {editablePerson.locationHistory.map(
+                          (location, index) => (
+                            <tr
+                              key={index}
+                              className="border-b border-gray-700 last:border-b-0"
+                            >
+                              <td className="px-6 py-4 text-gray-300">
+                                {location.place}
+                              </td>
+                              <td className="px-6 py-4 text-gray-300">
+                                {location.latlng.lat.toString() +
+                                  ", " +
+                                  location.latlng.lng.toString()}
+                              </td>
+                              <td className="px-6 py-4 text-gray-300">
+                                {location.dataset}
+                              </td>
+                              <td className="px-6 py-4 text-gray-300">
+                                {location.addedDate}
+                              </td>
+                              <td className="px-6 py-4">
+                                <button
+                                  className="text-gray-400 hover:text-gray-300"
+                                  onClick={() =>
+                                    handleDeleteLocation(location.place)
+                                  }
+                                >
+                                  <LsIcon name={LsIconName.Delete} />
+                                </button>
+                              </td>
+                            </tr>
+                          )
+                        )}
                       </tbody>
                     </table>
                   </CardContent>
@@ -340,7 +358,7 @@ const PersonProfile: React.FC<Props> = ({ currentTab }) => {
                   </h3>
                   <Card className="bg-black border-gray-700">
                     <CardContent className="p-6 space-y-4">
-                      {Person.activities.map((activity, index) => (
+                      {editablePerson.activities.map((activity, index) => (
                         <div key={index} className="flex items-center">
                           <Image
                             src={activity.avatarUrl}
@@ -371,7 +389,7 @@ const PersonProfile: React.FC<Props> = ({ currentTab }) => {
                   </h3>
                   <Card className="bg-black border-gray-700">
                     <CardContent className="p-6 space-y-4">
-                      {Person.compensationHistory.map((comp, index) => (
+                      {editablePerson.compensationHistory.map((comp, index) => (
                         <div key={index}>
                           <p className="font-semibold text-white">
                             {comp.amount.toFixed(2)} USD per {comp.frequency}

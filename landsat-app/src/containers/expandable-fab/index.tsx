@@ -1,20 +1,23 @@
 import { LsColor } from "@/constants/ls-color";
 import React, { useState } from "react";
-import { LsText } from "../LsText";
-import { LsIcon } from "../LsIcon";
+import { LsText } from "../../components/LsText";
+import { LsIcon } from "../../components/LsIcon";
 import { LsIconName } from "@/constants/ls-icon";
 import { useRouter } from "next/navigation";
+import { useClerk, useUser } from "@clerk/clerk-react";
 
 const Routes = [
-  "Settings",
-  "Notifications",
   "Profile",
-  "Log In",
-  "Log Out",
+  "Notifications",
+  "Sign In",
   "Sign Up",
+  "Log Out",
+  "Report",
 ];
 
 const ExpandableButton: React.FC = () => {
+  const { user } = useUser()
+  const { signOut } = useClerk();
   const router = useRouter();
   const [isExpanded, setIsExpanded] = useState(false);
 
@@ -30,14 +33,14 @@ const ExpandableButton: React.FC = () => {
       case "Notifications":
         router.push(`/profile/${action.toLowerCase()}`);
         break;
-      case "Log In":
-        router.push("/login");
+      case "Sign In":
+        router.push("/sign-in");
         break;
       case "Log Out":
-        router.push("/logout");
+        signOut({ redirectUrl: "/" });
         break;
       case "Sign Up":
-        router.push("/signup");
+        router.push("/sign-up");
         break;
       case "Settings":
         router.push("/settings");
@@ -47,8 +50,12 @@ const ExpandableButton: React.FC = () => {
     }
   };
 
+  const effectiveRoutes = user?.id
+    ? Routes.filter((route) => route !== "Sign In" && route !== "Sign Up")
+    : Routes.filter((route) => route !== "Log Out");
+
   return (
-    <div style={{ position: "fixed", bottom: "16px", right: "16px" }}>
+    <div style={{ position: "fixed", bottom: "3rem", right: "1rem" }}>
       <div
         style={{
           display: "flex",
@@ -56,7 +63,7 @@ const ExpandableButton: React.FC = () => {
           marginTop: "8px",
         }}
       >
-        {Routes.map((action, index) => (
+        {effectiveRoutes.map((action, index) => (
           <button
             key={action}
             style={{
