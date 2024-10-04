@@ -3,3 +3,6 @@ WRS2_descending_0/
 
 # __pycache__
 __pycache__/
+
+# landsat service account credentials
+landsat-*.json
