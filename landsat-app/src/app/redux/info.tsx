@@ -1,13 +1,14 @@
-import profileCat from '../../../public/profile_cat.jpeg';
-import { StaticImageData } from 'next/image';
+import { TLocation } from "@/types";
+import profileCat from "../../../public/profile_cat.jpeg";
+import { StaticImageData } from "next/image";
 
 // Types
+
 type FavoriteLocationsInfo = {
-  department: string;
-  division: string;
-  manager: string;
-  hireDate: string;
-  location: string;
+  place: string;
+  latlng: TLocation;
+  dataset: string;
+  addedDate: string;
 };
 
 type Activity = {
@@ -24,7 +25,7 @@ type CompensationInfo = {
   effectiveDate: string;
 };
 
-type Person = {
+export type Person = {
   id: string;
   name: string;
   avatarUrl: string | StaticImageData;
@@ -35,18 +36,13 @@ type Person = {
     cityState: string;
     postcode: string;
   };
-  details: {
-    dateOfBirth: string;
-    nationalId: string;
-    title: string;
-    hireDate: string;
-  };
+  details: { label: string; field: string }[];
   locationHistory: FavoriteLocationsInfo[];
   activities: Activity[];
   compensationHistory: CompensationInfo[];
 };
 
-export const Person: Person = {
+export const mockPerson: Person = {
   id: "#ERD246534",
   name: "Nicholas Swatz",
   avatarUrl: profileCat,
@@ -57,21 +53,37 @@ export const Person: Person = {
     cityState: "San Francisco CA",
     postcode: "94102",
   },
-  details: {
-    dateOfBirth: "Sep 26, 1988",
-    nationalId: "GER10654",
-    title: "Project Manager",
-    hireDate: "Jan 05, 2023",
-  },
+  details: [
+    { label: "Date of birth", field: "Sep 26, 1988" },
+    { label: "National ID", field: "GER10654" },
+    { label: "Title", field: "Project Manager" },
+    { label: "Join Date", field: "Jan 05, 2023" },
+  ],
   locationHistory: [
     {
-      department: "Creative Associate",
-      division: "Project Management",
-      manager: "Alex Foster",
-      hireDate: "May 13, 2024",
-      location: "Metro DC",
+      place: "Metro DC",
+      latlng: { lat: 38.9072, lng: -77.0369 },
+      dataset: "Landsat",
+      addedDate: "May 13, 2024",
     },
-    // Add more job history items as needed
+    {
+      place: "San Francisco",
+      latlng: { lat: 37.7749, lng: -122.4194 },
+      dataset: "Landsat",
+      addedDate: "May 13, 2024",
+    },
+    {
+      place: "New York",
+      latlng: { lat: 40.7128, lng: -74.006 },
+      dataset: "Landsat",
+      addedDate: "May 13, 2024",
+    },
+    {
+      place: "Los Angeles",
+      latlng: { lat: 34.0522, lng: -118.2437 },
+      dataset: "Landsat",
+      addedDate: "May 13, 2024",
+    }
   ],
   activities: [
     {
@@ -81,7 +93,6 @@ export const Person: Person = {
       date: "Jul 13, 2024",
       time: "05:36 PM",
     },
-    // Add more activities as needed
   ],
   compensationHistory: [
     {
@@ -89,6 +100,5 @@ export const Person: Person = {
       frequency: "month",
       effectiveDate: "May 10, 2015",
     },
-    // Add more compensation history items as needed
   ],
 };
