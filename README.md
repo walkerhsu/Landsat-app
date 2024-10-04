@@ -26,7 +26,8 @@ Welcome to the Landsat App! This application allows users to explore and analyze
    ```sh
    pip install -r requirements.txt
    ```
-3. Download the WRS-2 shapefile from [here](https://www.usgs.gov/media/files/landsat-wrs-2-descending-path-row-shapefile?fbclid=IwY2xjawFp_pxleHRuA2FlbQIxMAABHTm0y6w-RoejS6mhpnXnaCbeG73kpmbYd8vL2syKw2BkSLEafDngEzuJJw_aem_KbyoOgpr-g6Un6s8RxyH4w) and place it in the `backend` directory.
+3. Make sure you have the Google Earth Engine API key in the `backend` directory.
+It should be a json file with the service account email and private key.
 
 ## Landsat App Installation
 
@@ -46,10 +47,10 @@ Welcome to the Landsat App! This application allows users to explore and analyze
 
 ```sh
 cd backend
-python web_crawler.py
+python get_google_band_data.py
 ```
 
-It will get the Landsats bands and get the cloud cover percentage for the coordinates of the Taipei City from 2024-09-01 to 2024-09-30.
+It will get the RGB values for the coordinates and its neighboring 3x3 coordinates of the Taipei City from 2024-09-01 to 2024-09-30.
 
 ### Start the application:
 
