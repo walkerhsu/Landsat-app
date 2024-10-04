@@ -1,33 +1,62 @@
-from fastapi import APIRouter
-from user_data import UserData, Location
+from fastapi import APIRouter, HTTPException
+from user_data import UserData
+import firebase_admin
+from firebase_admin import credentials
+from firebase_admin import firestore
+
+# Use a service account.
+cred = credentials.Certificate('secret/firestore-sa.json')
+
+app = firebase_admin.initialize_app(cred)
+
+db = firestore.client()
 
 profile_router = APIRouter()
 
 
-@profile_router.get("/profile/")
-def read_item(user_id: str):
-    sample_user = UserData(
-        name="John Doe",
-        email="test@gmail.com",
-        profile_image="https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_1280.png",
-        locations=[
-            Location(lat=37.7749, lon=-122.4194, subscribed=True, index=0),
-            Location(lat=34.0522, lon=-118.2437, subscribed=False, index=1),
-        ],
-    )
-    return sample_user.model_dump()
+@profile_router.get("/profile/read/{user_id}")
+async def read_profile(user_id: str):
+    try: 
+        doc = db.collection('users').document(user_id)
+        data = doc.get()
+        
+        if not data.exists:
+            raise HTTPException(status_code=404, detail="User not found")
+        
+        return data.to_dict()
+    except Exception as e:
+        raise HTTPException(status_code=404, detail=str(e))
 
 
-@profile_router.put("/profile/save")
-def save_profile(name: str, email: str, joinDate: str):
-    return {"message": "Profile saved successfully"}
+@profile_router.post("/profile/save")
+async def save_profile(user_data: UserData):
+    
+    try:
+        doc = db.collection('users').document(user_data.id)
+        doc.set(user_data.model_dump())
+        user_data = user_data.model_dump()
+        user_data['status'] = "saved"
+        
+        return {"status": "saved", "id": user_data['id']}
+    except Exception as e:
+        raise HTTPException(status_code=404, detail=str(e))
 
 
-@profile_router.patch("/profile/update")
-def update_profile(name: str, email: str, joinDate: str):
-    return {"message": "Profile updated successfully"}
 
-
-@profile_router.delete("/profile/delete")
-def delete_profile(name: str, email: str, joinDate: str):
-    return {"message": "Profile deleted successfully"}
+@profile_router.post("/profile/update")
+async def update_profile(user_data: UserData):
+    try: 
+        doc = db.collection('users').document(user_data.id)
+        doc.update(user_data.model_dump())
+        return {"status": "updated", "id": user_data.id}
+    except Exception as e:
+        raise HTTPException(status_code=404, detail=str(e))
+    
+@profile_router.delete("/profile/delete/{user_id}")
+async def delete_profile(user_id: str):
+    try:
+        doc = db.collection('users').document(user_id)
+        doc.delete()
+        return {"status": "deleted", "id": user_id}
+    except Exception as e:
+        raise HTTPException(status_code=404, detail=str(e))
