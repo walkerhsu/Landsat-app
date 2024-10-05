@@ -2,92 +2,57 @@ import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { StaticImageData } from "next/image";
 import { mockPerson } from "./info";
 import { TLocation } from "@/types";
+import { PersonModel } from "@/models/person-model";
+import { LocationModel } from "@/models/location-model";
 
-// Types
-type FavoriteLocationsInfo = {
-  place: string;
-  latlng: TLocation;
-  dataset: string;
-  addedDate: string;
-};
-
-type Activity = {
-  name: string;
-  avatarUrl: string | StaticImageData;
-  action: string;
-  date: string;
-  time: string;
-};
-
-type CompensationInfo = {
-  amount: number;
-  frequency: string;
-  effectiveDate: string;
-};
-
-interface Person {
-  id: string;
-  name: string;
-  avatarUrl: string | StaticImageData;
-  phone: string;
-  email: string;
-  address: {
-    street: string;
-    cityState: string;
-    postcode: string;
-  };
-  details: { label: string; field: string  }[];
-  locationHistory: FavoriteLocationsInfo[];
-  activities: Activity[];
-  compensationHistory: CompensationInfo[];
-}
-
-const initialPerson: Person = mockPerson;
+const initialPerson: PersonModel = mockPerson;
 
 const personSlice = createSlice({
   name: "person",
   initialState: initialPerson,
   reducers: {
-    setEditablePerson: (state, action: PayloadAction<Person>) => {
+    setEditablePerson: (state, action: PayloadAction<PersonModel>) => {
       return action.payload;
     },
     updatePersonField: (
       state,
-      action: PayloadAction<{ field: keyof Person; value: any }>
+      action: PayloadAction<{ field: keyof PersonModel; value: any }>
     ) => {
-      state[action.payload.field] = action.payload.value;
-      console.log('updated person');
+      return {
+        ...state,
+        [action.payload.field]: action.payload.value,
+      };
     },
-    addLocation: (state, action: PayloadAction<FavoriteLocationsInfo>) => {
-      state.locationHistory.push(action.payload);
+    addLocation: (state, action: PayloadAction<LocationModel>) => {
+      state.getLocationHistory().push(action.payload);
     },
-    updateLocation: (state, action: PayloadAction<FavoriteLocationsInfo[]>) => {
-      state.locationHistory = action.payload;
+    updateLocation: (state, action: PayloadAction<LocationModel>) => {
+      state.updateLocationHistory(action.payload);
     },
     removeLocation: (state, action: PayloadAction<string>) => {
-      state.locationHistory = state.locationHistory.filter(
-        (location) => location.place !== action.payload
+      state.setLocationHistory(
+        state
+          .getLocationHistory()
+          .filter((location) => location.getId() !== action.payload)
       );
     },
     updateAddressField: (
       state,
       action: PayloadAction<{ name: string; value: string }>
     ) => {
-      state.address = {
-        ...state.address,
+      state.updateAddress({
+        ...state.getAddress(),
         [action.payload.name]: action.payload.value,
-      };
+      });
     },
     updateDetailField: (
-      state: Person,
+      state,
       action: PayloadAction<{ name: string; value: string }>
     ) => {
-      const updatedDetails = state.details.map((detail) =>
-        detail.label === action.payload.name
-          ? { ...detail, field: action.payload.value }
-          : detail
-      );
-      state.details = updatedDetails;
+      state.updateDetails({
+        label: action.payload.name,
+        field: action.payload.value,
+      });
     },
   },
 });

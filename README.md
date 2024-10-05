@@ -33,7 +33,7 @@ It should be a json file with the service account email and private key.
 
 1. Install dependencies:
    ```sh
-   cd landsat-app
+   cd frontend
    yarn
    ```
 2. Create a `.env.local` file in the root directory and add the following:
