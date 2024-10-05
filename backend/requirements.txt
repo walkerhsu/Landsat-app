@@ -3,4 +3,4 @@ earthengine-api==1.1.2
 uvicorn
 fastapi
 firebase-admin
-pyproj
+pyproj==3.7.0

@@ -2,91 +2,80 @@ import asyncio
 import json
 from fastapi import APIRouter, HTTPException, Query
 from typing import List
+
+from fastapi.responses import FileResponse
 from utils.get_google_band_data import LandsatGridAnalyzer
 from utils.parse_location import parse_location
-from user_data import Location, LatLng
+from user_data import Location, LatLng, CloudCoverage
 from globals import landsat_grid_analyzer
+from pydantic import BaseModel
 
 map_router = APIRouter()
+
+class DatasetInput(BaseModel):
+    startDate: str
+    endDate: str
+    cloudCoverage: CloudCoverage
+    locations: List[LatLng]
 
 
 @map_router.get("/map/dataset")
 async def get_dataset(
-    startDate: str,
-    endDate: str,
-    locations: str = Query(..., description="JSON string of LatLng objects"),
+    input: DatasetInput
 ):
     # # Parse the locations string into a list of LatLng objects
     try:
-        parsed_locations = parse_location(locations)
         all_dataset_list = await landsat_grid_analyzer.process_all_locations(
-            parsed_locations, startDate, endDate
+            input.locations, input.startDate, input.endDate, input.cloudCoverage
         )
-        return {
-            "error": None,
-            "datasets": all_dataset_list,
-        }
+        return all_dataset_list
     except Exception as e:
         raise HTTPException(status_code=400, detail=str(e))
 
+class GeoJsonInput(BaseModel):
+    datasetID: str
+    location: LatLng
 
 @map_router.get("/map/geojson")
-async def get_geojson(
-    categoryID: str,
-    locations: str = Query(..., description="JSON string of LatLng objects"),
+def get_geojson(
+    input: GeoJsonInput
 ):
     try:
-        parsed_locations = parse_location(locations)
-        all_geojson = await landsat_grid_analyzer.process_all_corners(
-            categoryID, parsed_locations
+        all_geojson = landsat_grid_analyzer.process_all_corners(
+            input.datasetID, input.location
         )
-        return {
-            "error": None,
-            "geojsons": all_geojson,
-        }
+        return all_geojson
     except Exception as e:
+        # raise e
         raise HTTPException(status_code=400, detail=str(e))
 
+class PixelInput(BaseModel):
+    datasetID: str
+    location: LatLng
 
-@map_router.get("/map/pixel")
-def get_pixel_data(
-    datasetID: str = Query(...),
-    lat: str = Query(...),
-    lng: str = Query(...),
-):
-    try:
-        SR_data = landsat_grid_analyzer.get_pixel_data(
-            datasetID, float(lat), float(lng)
-        )
-        return {
-            "error": None,
-            "SR_data": SR_data,
-        }
-    except Exception as e:
-        raise HTTPException(status_code=400, detail=str(e))
-
+class DownloadInput(BaseModel):
+    download_data: PixelInput
 
 @map_router.get("/map/download")
 def download_dataset(
-    queries: str = Query(...),
+    input: DownloadInput
 ):
     try:
-        queries = json.loads(queries)
-        SR_data = []
-        for datasetID in queries.keys():
-            for location in queries[datasetID]:
-                lat = float(location["lat"])
-                lng = float(location["lng"])
-                SR_data.append({
-                    "lat": lat,
-                    "lng": lng,
-                    "datasetID": datasetID,
-                    "SR_data": landsat_grid_analyzer.get_pixel_data(datasetID, lat, lng)
-                })
-
+        datasetID = input.download_data.datasetID
+        location = input.download_data.location
+        all_SR_data = landsat_grid_analyzer.download_dataset(datasetID, location)
+        # write with csv format, header is the keys of the SR_data
+        keys = ["index", "lat", "lng"] + list(all_SR_data[0].keys())
+        filename = datasetID.replace("/", "_")
+        with open(f"./{filename}.csv", "w") as f:
+            f.write(",".join(keys) + "\n")
+            for i in range(len(all_SR_data)):
+                row = [str(i+1)] + [str(value) for value in all_SR_data[i].values()]
+                f.write(",".join(row) + "\n")
         return {
-            "error": None,
-            "download_data": SR_data
+            "file":FileResponse(f"./{filename}.csv", media_type='application/octet-stream', filename=f"{filename}.csv"),
+            "filename": filename
         }
+
     except Exception as e:
-        raise HTTPException(status_code=400, detail=str(e))
+        raise HTTPException(status_code=400, detail=str(e)) 

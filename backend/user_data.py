@@ -22,6 +22,10 @@ class GeoJson(BaseModel):
     features: list[Feature]
 
 
+class CloudCoverage(BaseModel):
+    min: float
+    max: float
+
 class Location(BaseModel):
     place: str
     latlng: LatLng
