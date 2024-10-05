@@ -41,4 +41,3 @@ class UserData(BaseModel):
     phone: str
     details: list[Detail]
     locationHistory: list[Location]
-    
