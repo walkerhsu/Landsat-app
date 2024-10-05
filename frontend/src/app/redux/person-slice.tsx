@@ -36,7 +36,7 @@ interface Person {
     cityState: string;
     postcode: string;
   };
-  details: { label: string; field: string }[];
+  details: { label: string; field: string  }[];
   locationHistory: FavoriteLocationsInfo[];
   activities: Activity[];
   compensationHistory: CompensationInfo[];
@@ -56,6 +56,7 @@ const personSlice = createSlice({
       action: PayloadAction<{ field: keyof Person; value: any }>
     ) => {
       state[action.payload.field] = action.payload.value;
+      console.log('updated person');
     },
     addLocation: (state, action: PayloadAction<FavoriteLocationsInfo>) => {
       state.locationHistory.push(action.payload);

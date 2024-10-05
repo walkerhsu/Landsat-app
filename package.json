@@ -1,0 +1,11 @@
+{
+  "name": "main-project",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "dev": "cd frontend && yarn && yarn dev",
+    "build": "cd frontend && yarn && yarn build",
+    "start": "cd frontend && yarn && yarn start",
+    "lint": "cd frontend && yarn && yarn lint"
+  }
+}

@@ -1,3 +1,4 @@
+import { formatDate } from "@/lib/utils";
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 
 interface Timespan {
@@ -10,10 +11,6 @@ interface DatasetState {
   timespan: Timespan; // Timespan object
   datasetName: string; // Name of the dataset
 }
-
-const formatDate = (date: Date): string => {
-  return date.toISOString().split("T")[0];
-};
 
 const initialState: DatasetState = {
   locations: [],

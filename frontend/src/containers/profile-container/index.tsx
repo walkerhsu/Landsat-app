@@ -1,10 +1,11 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { RootState } from "@/app/redux/store";
 import {
   removeLocation,
+  setEditablePerson,
   updateAddressField,
   updateDetailField,
   updatePersonField,
@@ -25,7 +26,8 @@ import { LsIconName } from "@/constants/ls-icon";
 import { LsIcon } from "../../components/LsIcon";
 import { LsText } from "../../components/LsText";
 import { LsFontFamily, LsFontSize, LsFontWeight } from "@/constants/ls-fonts";
-import { useClerk } from "@clerk/nextjs";
+import { useUser, useClerk } from "@clerk/nextjs";
+import { formatDate } from "@/lib/utils";
 
 const tabs = [
   { id: "overview", label: "Overview" },
@@ -34,15 +36,49 @@ const tabs = [
 
 type Props = {
   currentTab: string;
+  // editablePerson: Person;
 };
 
 const PersonProfile: React.FC<Props> = ({ currentTab }) => {
+  const { user } = useUser();
   const { signOut } = useClerk();
   const router = useRouter();
   const dispatch = useDispatch();
-  const editablePerson = useSelector((state: RootState) => state.person); // Accessing editablePerson from Redux
 
   const [isEditing, setIsEditing] = useState(false);
+
+  const currentPerson = useSelector((state: RootState) => state.person);
+
+  useEffect(() => {
+    if (user?.id) {
+      const initPerson: Person = {
+        id: user.id,
+        name: user.username || "anonymous",
+        avatarUrl: user.imageUrl,
+        phone: user.phoneNumbers[0]?.phoneNumber || "",
+        email: user.emailAddresses[0].emailAddress,
+        address: {
+          street: "",
+          cityState: "",
+          postcode: "",
+        },
+        details: [
+          { label: "Date of birth", field: "" },
+          { label: "National ID", field: user.id },
+          { label: "Profession", field: "" },
+          {
+            label: "Join Date",
+            field: formatDate(user.createdAt || new Date()),
+          },
+        ],
+        locationHistory: [],
+        activities: [],
+        compensationHistory: [],
+      };
+      dispatch(setEditablePerson(initPerson));
+    }
+  }, [user, dispatch]);
+
   // const [editablePerson, setEditablePerson] = useState<Person>(Person);
 
   const handleEditClick = () => {
@@ -129,25 +165,27 @@ const PersonProfile: React.FC<Props> = ({ currentTab }) => {
                   <div className="flex items-start justify-between mb-4">
                     <div className="flex items-center">
                       <Image
-                        src={editablePerson.avatarUrl}
-                        alt={editablePerson.name}
+                        src={currentPerson.avatarUrl}
+                        alt={currentPerson.name}
                         className="w-16 h-16 rounded-lg mr-4"
+                        width={64}
+                        height={64}
                       />
-                      <div>
+                      <div className="mx-4">
                         {isEditing ? (
                           <Input
                             type="text"
                             name="name"
-                            value={editablePerson.name}
+                            value={currentPerson.name}
                             onChange={handleInputChange}
-                            className="p-3 text-xl font-semibold text-white bg-transparent border-b-2 border-white"
+                            className="w-40 p-3 text-xl font-semibold text-white bg-transparent border-b-2 border-white"
                           />
                         ) : (
                           <h2 className="text-xl font-semibold text-white">
-                            {editablePerson.name}
+                            {currentPerson.name}
                           </h2>
                         )}
-                        <p className="text-gray-400">{editablePerson.id}</p>
+                        <p className="text-gray-400 text-sm overflow-auto	">{currentPerson.id}</p>
                       </div>
                     </div>
                     <button
@@ -171,12 +209,12 @@ const PersonProfile: React.FC<Props> = ({ currentTab }) => {
                             <Input
                               type="text"
                               name="phone"
-                              value={editablePerson.phone}
+                              value={currentPerson.phone}
                               onChange={handleInputChange}
                               className="bg-transparent border-b-2 border-gray-300 text-gray-300"
                             />
                           ) : (
-                            editablePerson.phone
+                            currentPerson.phone
                           )}
                         </p>
                         <p className="flex items-center text-gray-300">
@@ -185,12 +223,12 @@ const PersonProfile: React.FC<Props> = ({ currentTab }) => {
                             <Input
                               type="email"
                               name="email"
-                              value={editablePerson.email}
+                              value={currentPerson.email}
                               onChange={handleInputChange}
                               className="bg-transparent border-b-2 border-gray-300 text-gray-300"
                             />
                           ) : (
-                            editablePerson.email
+                            currentPerson.email
                           )}
                         </p>
                       </div>
@@ -206,12 +244,12 @@ const PersonProfile: React.FC<Props> = ({ currentTab }) => {
                               <Input
                                 type="text"
                                 name="street"
-                                value={editablePerson.address.street}
+                                value={currentPerson.address.street}
                                 onChange={handleAddressChange}
                                 className="bg-transparent border-b-2 border-gray-300 text-gray-300"
                               />
                             ) : (
-                              editablePerson.address.street
+                              currentPerson.address.street
                             )}
                           </p>
                           <p className="ml-6 text-gray-300">
@@ -219,12 +257,12 @@ const PersonProfile: React.FC<Props> = ({ currentTab }) => {
                               <Input
                                 type="text"
                                 name="cityState"
-                                value={editablePerson.address.cityState}
+                                value={currentPerson.address.cityState}
                                 onChange={handleAddressChange}
                                 className="bg-transparent border-b-2 border-gray-300 text-gray-300"
                               />
                             ) : (
-                              editablePerson.address.cityState
+                              currentPerson.address.cityState
                             )}
                           </p>
                           <p className="ml-6 text-gray-300">
@@ -232,12 +270,12 @@ const PersonProfile: React.FC<Props> = ({ currentTab }) => {
                               <Input
                                 type="text"
                                 name="postcode"
-                                value={editablePerson.address.postcode}
+                                value={currentPerson.address.postcode}
                                 onChange={handleAddressChange}
                                 className="bg-transparent border-b-2 border-gray-300 text-gray-300"
                               />
                             ) : (
-                              editablePerson.address.postcode
+                              currentPerson.address.postcode
                             )}
                           </p>
                         </div>
@@ -248,7 +286,7 @@ const PersonProfile: React.FC<Props> = ({ currentTab }) => {
                           Person details
                         </h3>
                         <div className="space-y-2 w-full">
-                          {editablePerson.details.map((detail) => (
+                          {currentPerson.details.map((detail) => (
                             <div
                               className="flex justify-between text-gray-300"
                               key={detail.label}
@@ -262,7 +300,7 @@ const PersonProfile: React.FC<Props> = ({ currentTab }) => {
                                   {detail.label}
                                 </LsText>
                               </div>
-                              {isEditing ? (
+                              {isEditing && detail.label != 'Join Date' ? (
                                 <Input
                                   type="text"
                                   name={detail.label}
@@ -312,7 +350,7 @@ const PersonProfile: React.FC<Props> = ({ currentTab }) => {
                         </tr>
                       </thead>
                       <tbody>
-                        {editablePerson.locationHistory.map(
+                        {currentPerson.locationHistory.map(
                           (location, index) => (
                             <tr
                               key={index}
@@ -358,7 +396,7 @@ const PersonProfile: React.FC<Props> = ({ currentTab }) => {
                   </h3>
                   <Card className="bg-black border-gray-700">
                     <CardContent className="p-6 space-y-4">
-                      {editablePerson.activities.map((activity, index) => (
+                      {currentPerson.activities.map((activity, index) => (
                         <div key={index} className="flex items-center">
                           <Image
                             src={activity.avatarUrl}
@@ -389,7 +427,7 @@ const PersonProfile: React.FC<Props> = ({ currentTab }) => {
                   </h3>
                   <Card className="bg-black border-gray-700">
                     <CardContent className="p-6 space-y-4">
-                      {editablePerson.compensationHistory.map((comp, index) => (
+                      {currentPerson.compensationHistory.map((comp, index) => (
                         <div key={index}>
                           <p className="font-semibold text-white">
                             {comp.amount.toFixed(2)} USD per {comp.frequency}
