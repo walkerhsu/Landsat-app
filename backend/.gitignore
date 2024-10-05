@@ -1,8 +1,10 @@
 # shapefiles
 WRS2_descending_0/
 
+venv/
 # __pycache__
 __pycache__/
 
+secret/
 # landsat service account credentials
 earth-engine-SA-key.json
