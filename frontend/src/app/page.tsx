@@ -15,7 +15,7 @@ import { formatDate } from "@/lib/utils";
 
 const MainContent = () => {
   const profileApi = useMemo(() => ProfileApi.create(), []);
-  const latlng = useSelector((state: RootState) => state.location.latlng);
+  const latlng = useSelector((state: RootState) => state.location);
 
   const { isSignedIn, user } = useUser();
 

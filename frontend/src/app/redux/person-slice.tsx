@@ -1,11 +1,12 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { StaticImageData } from "next/image";
-import { mockPerson } from "./info";
+// import { mockPerson } from "./info";
 import { TLocation } from "@/types";
 import { PersonModel } from "@/models/person-model";
 import { LocationModel } from "@/models/location-model";
 
-const initialPerson: PersonModel = mockPerson;
+const initialPerson: PersonModel = PersonModel.createMockPerson();
+console.log(initialPerson);
 
 const personSlice = createSlice({
   name: "person",

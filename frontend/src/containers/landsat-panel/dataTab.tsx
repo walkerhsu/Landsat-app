@@ -14,9 +14,15 @@ import {
   setSource,
   setTime,
 } from "@/app/redux/selectedDataset-slice";
+import { MapModel } from "@/models/map-model";
 
-const DataTab: React.FC = () => {
-  const dataAttribute = useSelector((state: RootState) => state.dataAttribute);
+
+type DataProps = {
+  queryDataset: MapModel[];
+};
+
+const DataTab: React.FC<DataProps> = ({ queryDataset }) => {
+  // const dataAttribute = useSelector((state: RootState) => state.dataAttribute);
   const dispatch = useDispatch();
   const [selectedOptions, setSelectedOptions] = useState<{
     [key: string]: string;
@@ -27,25 +33,28 @@ const DataTab: React.FC = () => {
     setSelectedOptions((prev) => ({ ...prev, [category]: option }));
   };
 
-  const filteredItems = ITEMS.filter((item) => {
-    const matchesCategory = item.category
-      .toLowerCase()
-      .includes(dataAttribute.datasetName.toLowerCase());
-    const matchesLocation = dataAttribute.locations.some((location) =>
-      item.location.toLowerCase().includes(location.toLowerCase())
-    );
-    return matchesCategory && matchesLocation;
-  });
+  // READ
+  // const filteredItems = ITEMS.filter((item) => {
+  //   const matchesCategory = item.category
+  //     .toLowerCase()
+  //     .includes(dataAttribute.datasetName.toLowerCase());
+  //   const matchesLocation = dataAttribute.locations.some((location) =>
+  //     item.location.toLowerCase().includes(location.toLowerCase())
+  //   );
+  //   return matchesCategory && matchesLocation;
+  // });
 
   const handleFilteredItems = (items: typeof ITEMS) => {
     console.log("Filtered Items:", items);
     return items;
   };
 
-  const filteredDataset = handleFilteredItems(filteredItems);
+  // const filteredDataset = handleFilteredItems(filteredItems);
 
   const displayGridOnMap = (item: any, date: string) => {
-    console.log(`displaying grid on map for ${item.category} on ${date} ${item.geoJson.features.geometry}`);
+    console.log(
+      `displaying grid on map for ${item.category} on ${date} ${item.geoJson.features.geometry}`
+    );
     dispatch(setCategory(item.category));
     dispatch(setLocation({ place: item.location, geoJsons: item.geoJson }));
     dispatch(setSource(item.source));
@@ -70,12 +79,12 @@ const DataTab: React.FC = () => {
         className={styles.searchInput}
       />
       <div style={{ flexGrow: "1", maxHeight: "25rem", overflowY: "auto" }}>
-        {filteredDataset.length > 0 ? (
-          filteredDataset.map((item) => (
-            <div key={item.category} className={styles.item}>
-              <LsText>{item.category}</LsText>
-              <LsText size={LsFontSize.Sm}>{item.source}</LsText>
-              {item.options.map((date) => (
+        {queryDataset.length > 0 ? (
+          queryDataset.map((item) => (
+            <div key={item.getDataset()[0].getId()} className={styles.item}>
+              <LsText>{item.getCollectionName()}</LsText>
+              {/* <LsText size={LsFontSize.Sm}>{item.source}</LsText> */}
+              {item.getDataset().map((data) => (
                 <div
                   style={{
                     display: "flex",
@@ -84,15 +93,15 @@ const DataTab: React.FC = () => {
                     padding: "10px 0px",
                     cursor: "pointer  ",
                   }}
-                  key={date}
-                  onClick={() => displayGridOnMap(item, date)}
+                  key={data.getId()}
+                  onClick={() => displayGridOnMap(item, data.getDate())}
                 >
                   <LsCheckbox
-                    checked={selectedOptions[item.category] === date}
-                    onChange={() => handleOptionChange(item.category, date)}
+                    checked={selectedOptions[item.getCollectionName()] === data.getDate()}
+                    onChange={() => handleOptionChange(item.getCollectionName(), data.getDate())}
                   />
-                  <LsText key={date} size={LsFontSize.Sm}>
-                    {date}
+                  <LsText key={data.getId()} size={LsFontSize.Sm}>
+                    {data.getDate()}
                   </LsText>
                 </div>
               ))}

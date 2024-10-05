@@ -5,10 +5,14 @@ import { LsText } from "@/components/LsText";
 import { NoContentSection } from "@/components/no-content-section";
 import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "@/app/redux/store";
-import { addLocation, removeLocation, setEditablePerson } from "@/app/redux/person-slice";
+import {
+  addLocation,
+  removeLocation,
+  setEditablePerson,
+} from "@/app/redux/person-slice";
 import { LsColor } from "@/constants/ls-color";
 import { setLatLng } from "@/app/redux/location-slice";
-import { setDatasetLocations } from "@/app/redux/dataAttribute-slice";
+import { setDatasetAttributeOfLocations } from "@/app/redux/dataAttribute-slice";
 import { LsCheckbox } from "@/components/LsCheckbox";
 import { toggleCheckedItem } from "@/app/redux/checkedItems-slice";
 import { LsIcon } from "@/components/LsIcon";
@@ -18,14 +22,15 @@ import { PersonModel } from "@/models/person-model";
 import { useUser, useClerk } from "@clerk/nextjs";
 import { useSignIn } from "@clerk/clerk-react";
 import { LocationModel } from "@/models/location-model";
+import { TLocation } from "@/types";
 
 const LocationsPage: React.FC = () => {
   const profileApi = useMemo(() => ProfileApi.create(), []);
   const { isLoaded, signIn } = useSignIn();
   const { user } = useUser();
-  const locationHistory = useSelector((state: RootState) =>
-    state.person.getLocationHistory()
-  );
+  // const locationHistory = useSelector((state: RootState) =>
+  //   state.lll.getLocationHistory()
+  // );
   const checkedItems = useSelector((state: RootState) => state.checkedItems);
   const dispatch = useDispatch();
   const mockLocations = ["New York, USA", "Paris, France", "Tokyo, Japan"];
@@ -113,9 +118,8 @@ const LocationsPage: React.FC = () => {
     dispatch(removeLocation(location));
   };
 
-  const handleViewportChange = (location) => {
-    const latlng = location.latlng; // Assuming location object has a latlng property
-    dispatch(setLatLng(latlng)); // Dispatch the action to store latlng
+  const handleViewportChange = (location: TLocation) => {
+    dispatch(setLatLng(location)); // Dispatch the action to store latlng
   };
 
   return (
@@ -160,50 +164,54 @@ const LocationsPage: React.FC = () => {
         /> */}
 
       {/* List of Favorite Locations */}
-      <div className={styles.locationList}>
-        <div className="flex justify-center">
-          <ListGroup className="w-full bg-transparent">
-            {locationHistory.length > 0 ? (
-              locationHistory.map((location, index) => (
-                <ListGroupItem
-                  key={index}
-                  style={{ display: "flex", justifyContent: "space-between" }}
-                  onClick={() => handleViewportChange(location)}
-                  onMouseEnter={(e) => {
-                    e.stopPropagation();
-                    setHoveredItem(location.getPlace());
-                  }}
-                  onMouseOut={(e) => {
-                    e.stopPropagation();
-                    setHoveredItem("");
-                  }}
-                >
-                  <LsText
-                    color={
-                      hoveredItem === location.getPlace()
-                        ? LsColor.DarkBlue
-                        : LsColor.White
-                    }
-                  >
-                    {location.getPlace()}
-                  </LsText>
-                  <LsCheckbox
-                    checked={checkedItems.checkedItems.includes(
-                      location.getPlace()
-                    )}
-                    onChange={() => {
-                      dispatch(toggleCheckedItem(location.getPlace()));
-                      dispatch(setDatasetLocations(location.getPlace()));
+      {userLocation && (
+        <div className={styles.locationList}>
+          <div className="flex justify-center">
+            <ListGroup className="w-full bg-transparent">
+              {userLocation.length > 0 ? (
+                userLocation.map((location, index) => (
+                  <ListGroupItem
+                    key={index}
+                    style={{ display: "flex", justifyContent: "space-between" }}
+                    onClick={() => handleViewportChange(location.getLatlng())}
+                    onMouseEnter={(e) => {
+                      e.stopPropagation();
+                      setHoveredItem(location.getPlace());
                     }}
-                  />
-                </ListGroupItem>
-              ))
-            ) : (
-              <NoContentSection message="No favorite locations saved." />
-            )}
-          </ListGroup>
+                    onMouseOut={(e) => {
+                      e.stopPropagation();
+                      setHoveredItem("");
+                    }}
+                  >
+                    <LsText
+                      color={
+                        hoveredItem === location.getPlace()
+                          ? LsColor.DarkBlue
+                          : LsColor.White
+                      }
+                    >
+                      {location.getPlace()}
+                    </LsText>
+                    <LsCheckbox
+                      checked={checkedItems.checkedItems.includes(
+                        location.getPlace()
+                      )}
+                      onChange={() => {
+                        dispatch(toggleCheckedItem(location.getPlace()));
+                        dispatch(
+                          setDatasetAttributeOfLocations(location.getLatlng())
+                        );
+                      }}
+                    />
+                  </ListGroupItem>
+                ))
+              ) : (
+                <NoContentSection message="No favorite locations saved." />
+              )}
+            </ListGroup>
+          </div>
         </div>
-      </div>
+      )}
     </div>
   );
 };
