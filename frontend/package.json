@@ -4,13 +4,8 @@
   "private": true,
   "scripts": {
     "fastapi-dev": "pip install -r requirements.txt && python -m uvicorn api.index:app --reload",
-<<<<<<< HEAD
     "next-dev": "concurrently \"npm run next-dev\" \"npm run fastapi-dev\"",
     "dev": "next dev",
-=======
-    "next-dev": "next dev",
-    "dev": "concurrently \"npm run next-dev\" \"npm run fastapi-dev\"",
->>>>>>> c05e9b3 (add fastapi to next app)
     "build": "next build",
     "start": "next start",
     "lint": "next lint"
