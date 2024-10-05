@@ -167,7 +167,6 @@ class LandsatGridAnalyzer:
         band_values = scene_bands.reduceRegion(
             geometry=point, reducer=ee.Reducer.mean(), scale=1, tileScale=16
         ).getInfo()
-
         if bands == L2_BANDS:
             print("L2 Bands")
             blue = band_values["SR_B2"]
@@ -203,6 +202,16 @@ class LandsatGridAnalyzer:
             "ndsi": self.get_ndsi(green, swir),
             "temperature": temp
         }
+        return SR_data
+    
+    def download_datasets(self, datasetIDs, lat, lng):
+        SR_data = []
+        for datasetID in datasetIDs:
+            SR_data.append({
+                "lat": lat,
+                "lng": lng,
+                "SR_data": self.get_pixel_data(datasetID, lat, lng)
+            })
         return SR_data
 
     def get_RGB_data(self, red, green, blue, nir, swir):
