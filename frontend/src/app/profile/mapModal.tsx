@@ -27,7 +27,7 @@ const MapModal: React.FC<MapModalProps> = ({
           <FontAwesomeIcon icon={faTimes} />
         </button>
         <Mapbox
-          location={selectedLocation}
+          location={selectedLocation??{lat: 25.13680057687235, lng: 121.50427011487547}}
           onLocationSelect={onLocationSelect}
         />
         <div className={styles.mapButtonGroup}>

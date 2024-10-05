@@ -14,6 +14,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "@/app/redux/store";
 import { GeoJson } from "@/app/redux/selectedDataset-slice";
 import { mockGeoJson } from "./map-geojson";
+import Feature  from "react-map-gl";
 import { setViewport } from "@/app/redux/current-viewport-slice";
 import { MapApi } from "@/apis/map-api";
 import { SkeletonCard } from "../../components/skeleton-card";
@@ -176,6 +177,15 @@ export default function Mapbox({ location, onLocationSelect }: IMapboxProps) {
       handleFetchGeoJson();
     }
   }, [selectedDataset]);
+
+  const layerStyle = {
+    id: "point",
+    type: "circle",
+    paint: {
+      "circle-radius": 10,
+      "circle-color": "#007cbf",
+    },
+  };
 
   return (
     <>
