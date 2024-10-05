@@ -2,12 +2,13 @@
 
 import { useSelector } from "react-redux";
 import { RootState } from "@/app/redux/store";
-import { Suspense, useState } from "react";
+import { Suspense, useEffect, useState } from "react";
 import styles from "./page.module.css";
 import Mapbox from "@/components/mapbox";
 import FooterPanel from "@/components/footer-panel/footerPanel";
 import ExpandableButton from "@/containers/expandable-fab";
 import Panel from "@/containers/landsat-panel/panel";
+import { useUser } from "@clerk/nextjs";
 
 const MainContent = () => {
   const latlng = useSelector((state: RootState) => state.location.latlng);
@@ -17,7 +18,15 @@ const MainContent = () => {
   // const lat = searchParams?.get('lat');
   // const lng = searchParams?.get('lng');
 
-  const toggleDrawer = () => setIsDrawerOpen(!isDrawerOpen);
+  // const toggleDrawer = () => setIsDrawerOpen(!isDrawerOpen);
+
+  const { isSignedIn, user } = useUser();
+  
+  useEffect(() => {
+    if (isSignedIn && user) {
+      console.log("User is signed in");
+    }
+  }, [isSignedIn, user]);
 
   return (
     <div className={styles.mainPage}>
@@ -45,9 +54,9 @@ const MainContent = () => {
 export default function MainPage() {
   return (
     // <Provider store={store}>
-      <Suspense fallback={<div>Loading...</div>}>
-        <MainContent />
-      </Suspense>
+    <Suspense fallback={<div>Loading...</div>}>
+      <MainContent />
+    </Suspense>
     // </Provider>
   );
 }

@@ -9,6 +9,9 @@ const nextConfig = {
     });
     return config;
   },
+  images: {
+    domains: ['img.clerk.com'], // Add the external domain here
+  },
 };
 
 export default nextConfig;
