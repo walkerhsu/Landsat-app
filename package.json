@@ -3,7 +3,9 @@
   "version": "1.0.0",
   "private": true,
   "scripts": {
-    "dev": "cd frontend && yarn && yarn dev",
+    "install": "cd frontend && yarn && cd ../backend && pip install -r requirements.txt",
+    "dev": "cd frontend && yarn dev",
+    "server": "cd backend && python main.py",
     "build": "cd frontend && yarn && yarn build",
     "start": "cd frontend && yarn && yarn start",
     "lint": "cd frontend && yarn && yarn lint"

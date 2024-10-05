@@ -1,41 +1,112 @@
-import React, { useState } from "react";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 import styles from "./styles/tab.module.css";
 import { ListGroup, ListGroupItem } from "flowbite-react";
 import { LsText } from "@/components/LsText";
 import { NoContentSection } from "@/components/no-content-section";
 import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "@/app/redux/store";
-import {
-  addLocation,
-  removeLocation,
-  updateLocation,
-} from "@/app/redux/person-slice";
+import { addLocation, removeLocation, setEditablePerson } from "@/app/redux/person-slice";
 import { LsColor } from "@/constants/ls-color";
 import { setLatLng } from "@/app/redux/location-slice";
 import { setDatasetLocations } from "@/app/redux/dataAttribute-slice";
 import { LsCheckbox } from "@/components/LsCheckbox";
 import { toggleCheckedItem } from "@/app/redux/checkedItems-slice";
-
-const MAPBOX_TOKEN = process.env.NEXT_PUBLIC_MAPBOX_TOKEN!;
+import { LsIcon } from "@/components/LsIcon";
+import { LsIconName } from "@/constants/ls-icon";
+import { ProfileApi } from "@/apis/profile-api";
+import { PersonModel } from "@/models/person-model";
+import { useUser, useClerk } from "@clerk/nextjs";
+import { useSignIn } from "@clerk/clerk-react";
+import { LocationModel } from "@/models/location-model";
 
 const LocationsPage: React.FC = () => {
-  const locationHistory = useSelector(
-    (state: RootState) => state.person.locationHistory
+  const profileApi = useMemo(() => ProfileApi.create(), []);
+  const { isLoaded, signIn } = useSignIn();
+  const { user } = useUser();
+  const locationHistory = useSelector((state: RootState) =>
+    state.person.getLocationHistory()
   );
   const checkedItems = useSelector((state: RootState) => state.checkedItems);
   const dispatch = useDispatch();
-  const favoriteLocations = locationHistory.map((location) => location.place);
   const mockLocations = ["New York, USA", "Paris, France", "Tokyo, Japan"];
 
+  const [addHovered, setAddHovered] = useState<boolean>(false);
   const [searchTerm, setSearchTerm] = useState<string>("");
   const [hoveredItem, setHoveredItem] = useState<string>("");
   // const [checkedItems, setCheckedItems] = useState<string[]>([]);
 
-  const addLocationToFavorites = () => {
-    if (searchTerm && !favoriteLocations.includes(searchTerm)) {
-      // dispatch(addLocation({place: searchTerm}));
-      setSearchTerm(""); // Reset search bar after adding
+  const [userProfile, setUserProfile] = useState<PersonModel | null>(null);
+  const [userLocation, setUserLocation] = useState<LocationModel[] | null>(
+    null
+  );
+
+  const handlefetchUserProfile = useCallback(
+    async (userId: string) => {
+      const [error, returnedUserProfile] = await profileApi.fetchUserProfile(
+        userId
+      );
+      console.log(error, returnedUserProfile);
+      if (error) {
+        // notify users
+        return error;
+      }
+      if (!returnedUserProfile) {
+        console.log("User profile not found");
+        return null;
+      }
+      setUserProfile(returnedUserProfile);
+      setUserLocation(returnedUserProfile.getLocationHistory());
+      return null;
+    },
+    [profileApi, setUserLocation]
+  );
+
+  useEffect(() => {
+    console.log(signIn, user?.id);
+    if (isLoaded && signIn && user?.id) {
+      console.log(user?.id);
+      handlefetchUserProfile(user.id);
     }
+  }, [handlefetchUserProfile, signIn, user]);
+
+  const handleUpdateLocations = useCallback(async () => {
+    if (!userLocation) {
+      return;
+    }
+    setUserProfile((user) => {
+      if (!user) {
+        return null;
+      }
+      user.setLocationHistory(userLocation);
+      return user;
+    });
+
+    console.log(userProfile);
+
+    if (userProfile) {
+      let [error, status] = await profileApi.updateProfile(userProfile);
+      if (error) {
+        console.error("Failed to update profile");
+        return;
+      }
+    }
+    // error = await handlefetchUserProfile(draftUserProfile.getId());
+    // if (error) {
+    //   console.error("Failed to save profile");
+    //   return;
+    // }
+
+    if (userProfile) {
+      dispatch(setEditablePerson(userProfile));
+    }
+    console.log("Profile successfully updated");
+  }, [userProfile, profileApi, handlefetchUserProfile]);
+
+  const addLocationToFavorites = () => {
+    // if (searchTerm && !favoriteLocations.includes(searchTerm)) {
+    //   // dispatch(addLocation({place: searchTerm}));
+    //   setSearchTerm(""); // Reset search bar after adding
+    // }
   };
 
   const removeLocationFromFavorites = (location: string) => {
@@ -49,21 +120,37 @@ const LocationsPage: React.FC = () => {
 
   return (
     <div className={styles.pageContainer}>
-      <LsText>Saved Locations</LsText>
-
-      {/* Location Search Bar */}
-      <div className={styles.searchBar}>
-        {/* <input
-          type="text"
-          value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
-          placeholder="Search for a place"
-          className={styles.input}
-        /> */}
-        <button onClick={addLocationToFavorites} className={styles.addButton}>
-          Add to Favorites
+      <div
+        style={{
+          display: "flex",
+          width: "90%",
+          justifyContent: "space-between",
+          marginBottom: "1rem",
+        }}
+      >
+        <LsText>Saved Locations</LsText>
+        <button
+          onClick={addLocationToFavorites}
+          style={{
+            width: "24px",
+            height: "24px",
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+            backgroundColor: addHovered ? LsColor.Grey600 : "transparent",
+            borderRadius: "50%",
+          }}
+          onMouseEnter={() => setAddHovered(true)}
+          onMouseLeave={() => setAddHovered(false)}
+        >
+          <LsIcon name={LsIconName.Plus} />
         </button>
       </div>
+
+      {/* Location Search Bar */}
+      {/* <div className={styles.searchBar}>
+        
+      </div> */}
       {/* <Geocoder
           accessToken={MAPBOX_TOKEN}
           options={{
@@ -84,7 +171,7 @@ const LocationsPage: React.FC = () => {
                   onClick={() => handleViewportChange(location)}
                   onMouseEnter={(e) => {
                     e.stopPropagation();
-                    setHoveredItem(location.place);
+                    setHoveredItem(location.getPlace());
                   }}
                   onMouseOut={(e) => {
                     e.stopPropagation();
@@ -93,18 +180,20 @@ const LocationsPage: React.FC = () => {
                 >
                   <LsText
                     color={
-                      hoveredItem === location.place
+                      hoveredItem === location.getPlace()
                         ? LsColor.DarkBlue
                         : LsColor.White
                     }
                   >
-                    {location.place}
+                    {location.getPlace()}
                   </LsText>
                   <LsCheckbox
-                    checked={checkedItems.checkedItems.includes(location.place)}
+                    checked={checkedItems.checkedItems.includes(
+                      location.getPlace()
+                    )}
                     onChange={() => {
-                      dispatch(toggleCheckedItem(location.place));
-                      dispatch(setDatasetLocations(location.place));
+                      dispatch(toggleCheckedItem(location.getPlace()));
+                      dispatch(setDatasetLocations(location.getPlace()));
                     }}
                   />
                 </ListGroupItem>

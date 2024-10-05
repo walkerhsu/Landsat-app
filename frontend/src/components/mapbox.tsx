@@ -11,10 +11,11 @@ import mapboxgl from "mapbox-gl";
 import MapboxGeocoder from "@mapbox/mapbox-gl-geocoder";
 import { TLocation } from "../types";
 import { dataLayer } from "./map-style";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "@/app/redux/store";
 import { GeoJson } from "@/app/redux/selectedDataset-slice";
 import { mockGeoJson } from "./map-geojson";
+import { setViewport } from "@/app/redux/current-viewport-slice";
 
 const MAPBOX_TOKEN = process.env.NEXT_PUBLIC_MAPBOX_TOKEN!;
 
@@ -30,16 +31,18 @@ interface IMapboxProps {
 }
 
 export default function Mapbox({ location, onLocationSelect }: IMapboxProps) {
+  const viewport = useSelector((state: RootState) => state.currentViewport);
+  const dispatch = useDispatch();
   const selectedDataset = useSelector(
     (state: RootState) => state.selectedDataset
   );
   const [showMarker, setShowMarker] = useState<boolean>(false);
 
-  const [viewport, setViewport] = useState({
-    latitude: location.lat,
-    longitude: location.lng,
+  const initviewport = {
+    latitude: 25.13680057687235,
+    longitude: 121.50427011487547,
     zoom: 15,
-  });
+  };
   const mapRef = useRef<MapRef | null>(null);
   // const geocoderContainerRef = useRef<HTMLDivElement>(null);
 
@@ -51,23 +54,30 @@ export default function Mapbox({ location, onLocationSelect }: IMapboxProps) {
     });
   }, [location]);
 
+  // useEffect(() => {
+  //   handleViewportChange(initviewport);
+  // }, []);
+
+  const handleSaveFavoriteLocations = useCallback(() => {}, [viewport]);
+
   const handleViewportChange = useCallback(
     (newViewport: Viewport) => {
-      setViewport({
-        ...viewport,
-        latitude: newViewport.latitude,
-        longitude: newViewport.longitude,
-        zoom: newViewport.zoom ?? viewport.zoom,
-      });
-
+      console.log(mapRef.current);
       if (mapRef.current) {
         mapRef.current.flyTo({
           center: [newViewport.longitude, newViewport.latitude],
           zoom: newViewport.zoom ?? viewport.zoom,
         });
       }
+
+      dispatch(
+        setViewport({
+          center: { lat: newViewport.latitude, lng: newViewport.longitude },
+          zoom: newViewport.zoom ?? viewport.zoom,
+        })
+      );
     },
-    [viewport]
+    [viewport, mapRef.current]
   );
 
   const handleMapClick = (event: MapMouseEvent) => {
@@ -85,6 +95,7 @@ export default function Mapbox({ location, onLocationSelect }: IMapboxProps) {
   const handleMapLoad = () => {
     // setMapInstance(map);
     if (mapRef.current) {
+      console.log("Map loaded");
       mapRef.current.addControl(
         new MapboxGeocoder({
           accessToken: MAPBOX_TOKEN,
@@ -133,7 +144,7 @@ export default function Mapbox({ location, onLocationSelect }: IMapboxProps) {
     <MapGL
       ref={mapRef}
       mapboxAccessToken={MAPBOX_TOKEN}
-      initialViewState={viewport}
+      initialViewState={initviewport}
       // style={{ height: "60vh", width: "90vw" }}
       mapStyle="mapbox://styles/mapbox/standard-satellite"
       onClick={handleMapClick}
@@ -147,8 +158,10 @@ export default function Mapbox({ location, onLocationSelect }: IMapboxProps) {
 
       {showMarker && location && (
         <Marker
-          longitude={viewport.longitude}
-          latitude={viewport.latitude}
+          longitude={viewport.center.lng}
+          latitude={viewport.center.lat}
+          // longitude={location.lng}
+          // latitude={location.lat}
           color="red"
         />
       )}
