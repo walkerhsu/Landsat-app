@@ -1,16 +1,24 @@
 import { formatDate } from "@/lib/utils";
+import { TLocation } from "@/types";
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 
 interface Timespan {
-  startDate: string; // start date
-  endDate: string; // end date
+  startDate: string;
+  endDate: string;
+}
+
+interface CloudCoverage {
+  min: number;
+  max: number;
 }
 
 interface DatasetState {
-  locations: string[]; // Array of location strings
+  locations: TLocation[]; // Array of location strings
   timespan: Timespan; // Timespan object
-  datasetName: string; // Name of the dataset
+  cloudCoverage: CloudCoverage; // Number of cloud coverage
+  // datasetName: string; // Name of the dataset
 }
+
 
 const initialState: DatasetState = {
   locations: [],
@@ -18,47 +26,51 @@ const initialState: DatasetState = {
     startDate: formatDate(new Date()), // default to today
     endDate: formatDate(new Date()), // default to today
   },
-  datasetName: "",
+  cloudCoverage: {min: 0, max: 100},
 };
 
 const datasetSlice = createSlice({
   name: "dataset",
   initialState,
   reducers: {
-    setDatasetLocations(state, action: PayloadAction<string>) {
+    setDatasetAttributeOfLocations(state, action: PayloadAction<TLocation>) {
       if (!state.locations.some((location) => location === action.payload)) {
         const updatedLocations = new Set([...state.locations, action.payload]);
-        state.locations = Array.from(updatedLocations) as string[];
+        state.locations = Array.from(updatedLocations) as TLocation[];
       } else {
         state.locations = state.locations.filter(
           (location) => location !== action.payload
         );
       }
-      //   state.locations = action.payload;
       console.log(state.locations);
     },
-    setDatasetTimespan(state, action: PayloadAction<Timespan>) {
+    setDatasetAttributeOfTimespan(state, action: PayloadAction<Timespan>) {
       state.timespan = action.payload;
     },
-    setDatasetName(state, action: PayloadAction<string>) {
-      state.datasetName = action.payload;
+    setDatasetAttributeOfCloudCoverage(state, action: PayloadAction<CloudCoverage>){
+      state.cloudCoverage = action.payload;
     },
-    resetDataset(state) {
+    // setDatasetName(state, action: PayloadAction<string>) {
+    //   state.datasetName = action.payload;
+    // },
+    resetAllDatasetAttribute(state) {
       state.locations = [];
       state.timespan = {
         startDate: formatDate(new Date()),
         endDate: formatDate(new Date()),
       };
-      state.datasetName = "";
+      state.cloudCoverage = {min: 0, max: 100};
+      // state.datasetName = "";
     },
   },
 });
 
 export const {
-  setDatasetLocations,
-  setDatasetTimespan,
-  setDatasetName,
-  resetDataset,
+  setDatasetAttributeOfLocations,
+  setDatasetAttributeOfTimespan,
+  setDatasetAttributeOfCloudCoverage,
+  // setDatasetName,
+  resetAllDatasetAttribute,
 } = datasetSlice.actions;
 
 export default datasetSlice.reducer;

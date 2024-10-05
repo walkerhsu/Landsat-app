@@ -8,7 +8,7 @@ import currentViewportReducer from "./current-viewport-slice";
 
 const store = configureStore({
   reducer: {
-    person: personReducer,
+    lll: personReducer,
     location: locationReducer,
     dataAttribute: dataAttributeReducer,
     checkedItems: checkedItemsReducer,

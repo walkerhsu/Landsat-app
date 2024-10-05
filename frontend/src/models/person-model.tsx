@@ -32,12 +32,8 @@ export class PersonModel {
     avatarUrl: string,
     phone: string,
     email: string,
-    address: {
-      street: string;
-      cityState: string;
-      postcode: string;
-    },
-    details: { label: string; field: string }[],
+    address: Address,
+    details: Detail[],
     locationHistory: LocationModel[]
     // activities: ActivityModel[],
     // compensationHistory: CompensationModel[]
@@ -55,6 +51,39 @@ export class PersonModel {
       //   compensationHistory
     );
   }
+
+  static createMockPerson = (): PersonModel => {
+    console.log("Creating mock person");
+    const location1 = new LocationModel(
+        "1",
+        "Taipei",
+        { lat: 25.123456, lng: 121.654321 },
+        "LANDSAT/LC08/C02/T1_TOA",
+        "2024-09-01"
+    )
+    return PersonModel.create(
+      "#MOCK12345", // Mock id
+      "John Doe", // Mock name
+      "/_next/static/media/profile_mock.jpeg", // Mock avatar URL
+      "(123) 456-7890", // Mock phone
+      "johndoe@example.com", // Mock email
+      {
+        street: "123 Main St", // Mock address
+        cityState: "Springfield, IL",
+        postcode: "62701",
+      },
+      [
+        { label: "Occupation", field: "Engineer" }, // Mock details
+        { label: "Hobby", field: "Photography" },
+      ],
+      [
+        location1,
+      ]
+      // Uncomment below if you need mock activities or compensation history
+      // mockActivities(),
+      // mockCompensationHistory()
+    );
+  };
 
   public getDefaultImageUrl(): string {
     return "https://imgv3.fotor.com/images/blog-cover-image/10-profile-picture-ideas-to-make-you-stand-out.jpg";
@@ -89,6 +118,7 @@ export class PersonModel {
   }
 
   public getLocationHistory() {
+    // console.log(this.locationHistory);
     return this.locationHistory;
   }
 
@@ -157,12 +187,12 @@ export class PersonModel {
     this.locationHistory = updatedLocationHistory;
   }
 
-//   public removeLocationHistory(locationIds: string[]) {
-//     const updatedLocationHistory = this.locationHistory.filter(
-//       (location) => !locationIds.includes(location.getId())
-//     );
-//     this.locationHistory = updatedLocationHistory;
-//   }
+  //   public removeLocationHistory(locationIds: string[]) {
+  //     const updatedLocationHistory = this.locationHistory.filter(
+  //       (location) => !locationIds.includes(location.getId())
+  //     );
+  //     this.locationHistory = updatedLocationHistory;
+  //   }
 
   public clone() {
     return new PersonModel(

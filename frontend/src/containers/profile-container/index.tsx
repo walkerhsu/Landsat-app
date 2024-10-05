@@ -22,7 +22,7 @@ import { useUser, useClerk } from "@clerk/nextjs";
 import { useSignIn } from "@clerk/clerk-react";
 import { ProfileApi } from "@/apis/profile-api";
 import { PersonModel } from "@/models/person-model";
-import { mockPerson } from "@/app/redux/info";
+// import { mockPerson } from "@/app/redux/info";
 import { LocationModel } from "@/models/location-model";
 
 const tabs = [
@@ -77,9 +77,10 @@ const PersonProfile: React.FC<Props> = ({ currentTab }) => {
     if (isLoaded && signIn && user?.id) {
       console.log(user?.id);
       handlefetchUserProfile(user.id);
-    } else if (isLoaded) {
-      setUserProfile(mockPerson);
     }
+    // } else if (isLoaded) {
+    //   setUserProfile(mockPerson);
+    // }
     if (userProfile) {
       dispatch(setEditablePerson(userProfile));
     }
