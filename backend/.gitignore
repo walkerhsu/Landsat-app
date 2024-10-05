@@ -8,3 +8,6 @@ __pycache__/
 secret/
 # landsat service account credentials
 earth-engine-SA-key.json
+
+# csv
+*.csv
