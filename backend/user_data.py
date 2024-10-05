@@ -23,11 +23,6 @@ class GeoJson(BaseModel):
 
 
 class Location(BaseModel):
-    lat: float
-    lng: float
-
-
-class Location(BaseModel):
     place: str
     latlng: LatLng
     dataset: str
