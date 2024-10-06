@@ -10,7 +10,7 @@
   padding: 16px;
   cursor: grab;
   z-index: 1000;
-  height: 20vh;
+  height: 70vh;
   overflow-y: auto; /* Allow scrolling if content overflows */
   transition: height 0.3s ease;
 }

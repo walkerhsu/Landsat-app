@@ -4,7 +4,6 @@ import "mapbox-gl/dist/mapbox-gl.css";
 import "react-map-gl-geocoder/dist/mapbox-gl-geocoder.css";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Layer, MapRef, Marker, Source } from "react-map-gl";
-import styles from "@/components/styles/mapbox.module.css";
 import { MapMouseEvent } from "mapbox-gl";
 import MapGL from "react-map-gl";
 import mapboxgl from "mapbox-gl";
@@ -16,6 +15,10 @@ import { RootState } from "@/app/redux/store";
 import { GeoJson } from "@/app/redux/selectedDataset-slice";
 import { mockGeoJson } from "./map-geojson";
 import { setViewport } from "@/app/redux/current-viewport-slice";
+import { MapApi } from "@/apis/map-api";
+import { SkeletonCard } from "./skeleton-card";
+import { calcGeoJson } from "./utils/calc-geojson";
+import { setSRData } from "@/app/redux/srData-slice";
 
 const MAPBOX_TOKEN = process.env.NEXT_PUBLIC_MAPBOX_TOKEN!;
 
@@ -30,13 +33,24 @@ interface IMapboxProps {
   onLocationSelect: (location: TLocation) => void;
 }
 
+interface IAllGridsCoordinates {
+  allCorners: number[][][] | undefined;
+}
+
 export default function Mapbox({ location, onLocationSelect }: IMapboxProps) {
+  const mapApi = useMemo(() => new MapApi(), []);
   const viewport = useSelector((state: RootState) => state.currentViewport);
   const dispatch = useDispatch();
   const selectedDataset = useSelector(
     (state: RootState) => state.selectedDataset
   );
   const [showMarker, setShowMarker] = useState<boolean>(false);
+
+  // const [viewport, setViewport] = useState({
+  //   latitude: 25.13680057687235,
+  //   longitude: 121.50427011487547,
+  //   zoom: 15,
+  // });
 
   const initviewport = {
     latitude: 25.13680057687235,
@@ -54,22 +68,16 @@ export default function Mapbox({ location, onLocationSelect }: IMapboxProps) {
     });
   }, [location]);
 
-  // useEffect(() => {
-  //   handleViewportChange(initviewport);
-  // }, []);
-
   const handleSaveFavoriteLocations = useCallback(() => {}, [viewport]);
 
   const handleViewportChange = useCallback(
     (newViewport: Viewport) => {
-      console.log(mapRef.current);
       if (mapRef.current) {
         mapRef.current.flyTo({
           center: [newViewport.longitude, newViewport.latitude],
           zoom: newViewport.zoom ?? viewport.zoom,
         });
       }
-
       dispatch(
         setViewport({
           center: { lat: newViewport.latitude, lng: newViewport.longitude },
@@ -80,22 +88,13 @@ export default function Mapbox({ location, onLocationSelect }: IMapboxProps) {
     [viewport, mapRef.current]
   );
 
-  const handleMapClick = (event: MapMouseEvent) => {
-    const { lng, lat } = event.lngLat;
-    // const { x: cursorX, y: cursorY } = event.point;
-    // setLocation({ lat, lng });
-    handleViewportChange({
-      latitude: lat,
-      longitude: lng,
-      zoom: 16,
-    });
-    setShowMarker(true);
-    onLocationSelect({ lat, lng });
-  };
+  const [isloading, setIsLoading] = useState<boolean>(false);
+
   const handleMapLoad = () => {
-    // setMapInstance(map);
+    setIsLoading(true);
     if (mapRef.current) {
-      console.log("Map loaded");
+      // console.log("Map loaded");
+      setIsLoading(false);
       mapRef.current.addControl(
         new MapboxGeocoder({
           accessToken: MAPBOX_TOKEN,
@@ -109,13 +108,48 @@ export default function Mapbox({ location, onLocationSelect }: IMapboxProps) {
       mapRef.current.addControl(new mapboxgl.NavigationControl(), "right");
     }
   };
-  const [allData, setAllData] = useState<GeoJson[] | null>(null);
 
-  const data = useMemo(() => {
-    // console.log(mockGeoJson);
-    return allData;
-    // return [mockGeoJson];
-  }, [allData]);
+  const [allGeoJsons, setAllGeoJsons] = useState<GeoJson | null>(null);
+  // const [allData, setAllData] = useState<GeoJson[] | null>(null);
+
+  const handleMapClick = (event: MapMouseEvent) => {
+    const { lng, lat } = event.lngLat;
+    const SR_data = calcGeoJson({ lng, lat }, allGeoJsons!);
+    if (SR_data) {
+      dispatch(setSRData(SR_data));
+    }
+    event.originalEvent.stopPropagation();
+    handleViewportChange({
+      latitude: lat,
+      longitude: lng,
+      zoom: 18.5,
+    });
+    setShowMarker(true);
+    onLocationSelect({ lat, lng });
+  };
+
+  const handleFetchGeoJson = useCallback(async () => {
+    const [error, returnedGeoJson] = await mapApi.fetchGeoJson(
+      selectedDataset.datasetID,
+      selectedDataset.location
+    );
+    if (error) {
+      console.log(error);
+      return;
+    }
+    setAllGeoJsons(returnedGeoJson);
+    handleViewportChange({
+      latitude: selectedDataset.location.lat,
+      longitude: selectedDataset.location.lng,
+      zoom: 18.5,
+    });
+    return null;
+  }, [mapApi, selectedDataset, setAllGeoJsons, handleViewportChange]);
+
+  const allGeoJsonsData = useMemo(() => {
+    // console.log("allGeoJsons: ", allGeoJsons);
+    return allGeoJsons;
+  }, [allGeoJsons]);
 
   // const fetchGeoJson = async () => {
   //   try {
@@ -129,45 +163,45 @@ export default function Mapbox({ location, onLocationSelect }: IMapboxProps) {
   //   }
   // }
 
+  // const data = mockGeoJson
+
   useEffect(() => {
     // console.log(selectedDataset);
-    // console.log(selectedDataset.locations.map((loc) => loc.geoJsons));
-    setAllData(selectedDataset.locations.map((loc) => loc.geoJsons));
     // setAllData([mockGeoJson]);
     // fetchGeoJson();
+    handleFetchGeoJson();
   }, [selectedDataset]);
 
   return (
-    // <div className={styles.mapOverlay}>
-    // <div className={styles.mapContainer}>
-    // {
-    <MapGL
-      ref={mapRef}
-      mapboxAccessToken={MAPBOX_TOKEN}
-      initialViewState={initviewport}
-      // style={{ height: "60vh", width: "90vw" }}
-      mapStyle="mapbox://styles/mapbox/standard-satellite"
-      onClick={handleMapClick}
-      onLoad={handleMapLoad}
-    >
-      {data?.map((item, index) => (
-        <Source key={index} type="geojson" data={item}>
-          <Layer {...dataLayer} />
-        </Source>
-      ))}
+    <>
+      {isloading ? (
+        <SkeletonCard />
+      ) : (
+        <MapGL
+          ref={mapRef}
+          mapboxAccessToken={MAPBOX_TOKEN}
+          initialViewState={initviewport}
+          mapStyle="mapbox://styles/mapbox/standard-satellite"
+          onClick={handleMapClick}
+          onLoad={handleMapLoad}
+        >
+          {/* {allGeoJsonsData && ( */}
+          {/* <div onClick={() => console.log("clicked")}> */}
+          <Source type="geojson" data={allGeoJsonsData}>
+            <Layer {...dataLayer} />
+          </Source>
+          {/* </div> */}
+          {/* )} */}
 
-      {showMarker && location && (
-        <Marker
-          longitude={viewport.center.lng}
-          latitude={viewport.center.lat}
-          // longitude={location.lng}
-          // latitude={location.lat}
-          color="red"
-        />
+          {showMarker && location && (
+            <Marker
+              longitude={viewport.center.lng}
+              latitude={viewport.center.lat}
+              color="red"
+            />
+          )}
+        </MapGL>
       )}
-    </MapGL>
-    // }
-    // </div>
-    // </div>
+    </>
   );
 }

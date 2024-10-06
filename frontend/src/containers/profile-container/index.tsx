@@ -2,7 +2,7 @@
 
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { useDispatch } from "react-redux";
-import { setEditablePerson } from "@/app/redux/person-slice";
+import { parsePersonModel, setEditablePerson } from "@/app/redux/person-slice";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { MapPin, Mail, Phone } from "lucide-react";
@@ -22,7 +22,7 @@ import { useUser, useClerk } from "@clerk/nextjs";
 import { useSignIn } from "@clerk/clerk-react";
 import { ProfileApi } from "@/apis/profile-api";
 import { PersonModel } from "@/models/person-model";
-import { mockPerson } from "@/app/redux/info";
+// import { mockPerson } from "@/app/redux/info";
 import { LocationModel } from "@/models/location-model";
 
 const tabs = [
@@ -77,11 +77,12 @@ const PersonProfile: React.FC<Props> = ({ currentTab }) => {
     if (isLoaded && signIn && user?.id) {
       console.log(user?.id);
       handlefetchUserProfile(user.id);
-    } else if (isLoaded) {
-      setUserProfile(mockPerson);
     }
+    // } else if (isLoaded) {
+    //   setUserProfile(mockPerson);
+    // }
     if (userProfile) {
-      dispatch(setEditablePerson(userProfile));
+      dispatch(setEditablePerson(parsePersonModel(userProfile)));
     }
   }, [handlefetchUserProfile, signIn, user]);
 
@@ -101,7 +102,7 @@ const PersonProfile: React.FC<Props> = ({ currentTab }) => {
     // }
     setIsEditing(!isEditing);
     if (userProfile) {
-      dispatch(setEditablePerson(draftUserProfile));
+      dispatch(setEditablePerson(parsePersonModel(draftUserProfile)));
     }
     console.log("Profile successfully saved");
   }, [draftUserProfile, profileApi, handlefetchUserProfile]);

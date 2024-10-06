@@ -3,16 +3,60 @@ import { Datepicker } from "flowbite-react";
 import styles from "./styles/tab.module.css";
 import { LsText } from "@/components/LsText";
 import { Slider } from "@/components/magicui/slider";
+import { useDispatch, useSelector } from "react-redux";
+import {
+  setDatasetAttributeOfCloudCoverage,
+  setDatasetAttributeOfTimespan,
+} from "@/app/redux/dataAttribute-slice";
+import { formatDate } from "@/lib/utils";
+import { RootState } from "@/app/redux/store";
 
-type ValuePiece = Date | null;
+type FilterProps = {
+  isEditMode: boolean;
+};
 
-type Value = ValuePiece | [ValuePiece, ValuePiece];
-
-const FiltersTab: React.FC = () => {
+const FiltersTab: React.FC<FilterProps> = ({ isEditMode }) => {
+  const savedStartDate = useSelector(
+    (state: RootState) => state.dataAttribute.timespan.startDate
+  );
+  const dispatch = useDispatch();
   const [cloudCoverage, setCloudCoverage] = useState([0, 100]); // Slider range for cloud coverage
-  const [value, onChange] = useState<Value>(new Date());
-  const [startDate, setStartDate] = useState<Date | null>(null);
-  const [endDate, setEndDate] = useState<Date | null>(null);
+  const [startDate, setStartDate] = useState<Date>(new Date());
+  const [endDate, setEndDate] = useState<Date>(new Date());
+
+  const handleSetCloudCoverage = (value: number[]) => {
+    setCloudCoverage(value);
+    dispatch(
+      setDatasetAttributeOfCloudCoverage({
+        min: value[0],
+        max: value[1],
+      })
+    );
+  };
+
+  const handleSetStartDate = (e) => {
+    console.log(e);
+    setStartDate(e);
+    dispatch(
+      setDatasetAttributeOfTimespan({
+        startDate: formatDate(e),
+        endDate: formatDate(e),
+      })
+    );
+    console.log("Start Date:", e);
+  };
+
+  const handleSetEndDate = (e) => {
+    // const { date } = e.target.value;
+    setEndDate(e);
+    dispatch(
+      setDatasetAttributeOfTimespan({
+        startDate: savedStartDate,
+        endDate: formatDate(e),
+      })
+    );
+    console.log("End Date:", e);
+  };
 
   return (
     <div className={styles.tabContent}>
@@ -27,7 +71,7 @@ const FiltersTab: React.FC = () => {
         </div>
         <Slider
           value={cloudCoverage}
-          onValueChange={(value) => setCloudCoverage(value)}
+          onValueChange={(value) => handleSetCloudCoverage(value)}
           max={100}
           step={1}
         />
@@ -60,7 +104,7 @@ const FiltersTab: React.FC = () => {
               <LsText>Start Date</LsText>
             </div>
             <Datepicker
-              onChange={setStartDate}
+              onChange={handleSetStartDate}
               placeholder="Select start date"
             />
           </div>
@@ -69,7 +113,7 @@ const FiltersTab: React.FC = () => {
               <LsText>End Date</LsText>
             </div>
             <Datepicker
-              onChange={setEndDate}
+              onChange={handleSetEndDate}
               minDate={startDate ? startDate : new Date()}
               placeholder="Select End date"
             />

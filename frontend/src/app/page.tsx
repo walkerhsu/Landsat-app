@@ -15,43 +15,43 @@ import { formatDate } from "@/lib/utils";
 
 const MainContent = () => {
   const profileApi = useMemo(() => ProfileApi.create(), []);
-  const latlng = useSelector((state: RootState) => state.location.latlng);
+  const latlng = useSelector((state: RootState) => state.location);
 
   const { isSignedIn, user } = useUser();
 
-  const handleSaveProfile = async (initUserData: PersonModel) => {
-    const [error, status] = await profileApi.saveProfile(initUserData);
-    console.log("Profile saved");
-  };
+  // const handleSaveProfile = async (initUserData: PersonModel) => {
+  //   const [error, status] = await profileApi.saveProfile(initUserData);
+  //   console.log("Profile saved");
+  // };
 
-  useEffect(() => {
-    if (isSignedIn && user) {
-      console.log("User is signed in");
-      const initUser: PersonModel = PersonModel.create(
-        user.id,
-        user.username || "anonymous",
-        user.imageUrl,
-        user.phoneNumbers[0]?.phoneNumber || "",
-        user.emailAddresses[0].emailAddress,
-        {
-          street: "",
-          cityState: "",
-          postcode: "",
-        },
-        [
-          { label: "Date of birth", field: "" },
-          { label: "National ID", field: user.id },
-          { label: "Profession", field: "" },
-          {
-            label: "Join Date",
-            field: formatDate(user.createdAt || new Date()),
-          },
-        ],
-        []
-      );
-      handleSaveProfile(initUser);
-    }
-  }, [isSignedIn, user]);
+  // useEffect(() => {
+  //   if (isSignedIn && user) {
+  //     console.log("User is signed in");
+  //     const initUser: PersonModel = PersonModel.create(
+  //       user.id,
+  //       user.username || "anonymous",
+  //       user.imageUrl,
+  //       user.phoneNumbers[0]?.phoneNumber || "",
+  //       user.emailAddresses[0].emailAddress,
+  //       {
+  //         street: "",
+  //         cityState: "",
+  //         postcode: "",
+  //       },
+  //       [
+  //         { label: "Date of birth", field: "" },
+  //         { label: "National ID", field: user.id },
+  //         { label: "Profession", field: "" },
+  //         {
+  //           label: "Join Date",
+  //           field: formatDate(user.createdAt || new Date()),
+  //         },
+  //       ],
+  //       []
+  //     );
+  //     handleSaveProfile(initUser);
+  //   }
+  // }, [isSignedIn, user]);
 
   return (
     <div className={styles.mainPage}>

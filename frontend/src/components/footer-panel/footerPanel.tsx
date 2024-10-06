@@ -5,6 +5,10 @@ import { LsText } from "../LsText";
 import { LsIcon } from "../LsIcon";
 import { LsIconName } from "@/constants/ls-icon";
 import { NumberTickerComponent } from "../number-ticker";
+import { useSelector } from "react-redux";
+import { RootState } from "@/app/redux/store";
+import { SRDataDisplay } from "./bentoGrid";
+import { MarqueeSRData } from "./marquee";
 
 // Example data for the bar chart
 const barChartData = [
@@ -15,6 +19,7 @@ const barChartData = [
 ];
 
 const FooterPanel: React.FC = () => {
+  const srData = useSelector((state: RootState) => state.srData.data)
   const [isOpen, setIsOpen] = useState(false);
 
   return (
@@ -38,14 +43,16 @@ const FooterPanel: React.FC = () => {
           <LsText>Statistics Panel</LsText>
 
           {/* Statistics List */}
-          <div style={{display: 'flex', margin: '1rem 0', gap: '1rem'}}>
+          {/* <MarqueeSRData sr_data={srData } /> */}
+          <SRDataDisplay srData={srData!} />
+          {/* <div style={{display: 'flex', margin: '1rem 0', gap: '1rem'}}>
             <LsText>NDVI:</LsText>
             <NumberTickerComponent value={0.45} />
             <LsText>NDSI:</LsText>
             <NumberTickerComponent value={0.65} />
             <LsText>Cloud Cover:</LsText>
             <NumberTickerComponent value={0.1} />
-          </div>
+          </div> */}
 
           {/* D3 Bar Chart */}
           <div className={styles.graphContainer}>
