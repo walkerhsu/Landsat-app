@@ -1,15 +1,13 @@
-import asyncio
-import json
 from fastapi import APIRouter, HTTPException, Query
 from typing import List
 
 from fastapi.responses import FileResponse
 import httpx
-from utils.get_google_band_data import LandsatGridAnalyzer
-from utils.parse_location import parse_location
-from user_data import Location, LatLng, CloudCoverage
+from user_data import LatLng, CloudCoverage, SR_data
 from globals import landsat_grid_analyzer
 from pydantic import BaseModel
+
+from utils.chat_completion import chat_completion
 
 map_router = APIRouter()
 
@@ -41,10 +39,11 @@ class GeoJsonInput(BaseModel):
 @map_router.post("/map/geojson")
 def get_geojson(input: GeoJsonInput):
     try:
+        print(input.datasetID, input.location)
         all_geojson = landsat_grid_analyzer.process_all_corners(
             input.datasetID, input.location
         )
-        return all_geojson
+        return all_geojson    
     except Exception as e:
         # raise e
         raise HTTPException(status_code=400, detail=str(e))
@@ -114,3 +113,17 @@ async def reverse_geocode(
 
     except Exception as e:
         raise HTTPException(status_code=400, detail=str(e))
+        raise HTTPException(status_code=400, detail=str(e)) 
+
+class LLMQueryInput(BaseModel):
+    API_KEY: str
+    query: SR_data
+
+@map_router.get("/map/LLM_query")
+def LLM_query(
+    input: LLMQueryInput
+):
+    try:
+        chat_completion(input.query, input.API_KEY)
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=str(e)) 

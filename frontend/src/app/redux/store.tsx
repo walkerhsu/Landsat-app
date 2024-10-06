@@ -6,6 +6,7 @@ import checkedItemsReducer from "./checkedItems-slice";
 import selectedDatasetReducer from "./selectedDataset-slice";
 import currentViewportReducer from "./current-viewport-slice";
 import srDataReducer from "./srData-slice";
+import tutorialReducer from "./tutorial-slice";
 
 const store = configureStore({
   reducer: {
@@ -16,6 +17,7 @@ const store = configureStore({
     selectedDataset: selectedDatasetReducer,
     currentViewport: currentViewportReducer,
     srData: srDataReducer,
+    tutorial: tutorialReducer,
   },
 });
 
