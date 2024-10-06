@@ -6,9 +6,12 @@ import { formatDate } from "@/lib/utils";
 import { PersonModel } from "@/models/person-model";
 import { useUser } from "@clerk/nextjs";
 import { ProfileApi } from "@/apis/profile-api";
+import { useDispatch } from "react-redux";
+import { parsePersonModel, setEditablePerson } from "../redux/person-slice";
 
 const LoadingPage = () => {
   const { user } = useUser();
+  const dispatch = useDispatch();
   const profileApi = useMemo(() => ProfileApi.create(), []);
 
   const handleSaveProfile = async (initUserData: PersonModel) => {
@@ -46,6 +49,7 @@ const LoadingPage = () => {
         []
       );
       handleSaveProfile(initUser);
+      dispatch(setEditablePerson(parsePersonModel(initUser)));
       redirectToMainPage();
     }
   }, [user]);
