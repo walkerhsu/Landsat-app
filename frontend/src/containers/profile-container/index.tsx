@@ -23,6 +23,7 @@ import { useSignIn } from "@clerk/clerk-react";
 import { ProfileApi } from "@/apis/profile-api";
 import { PersonModel } from "@/models/person-model";
 import { LocationModel } from "@/models/location-model";
+import ReportPage from "./report";
 
 const tabs = [
   { id: "overview", label: "Overview" },
@@ -552,11 +553,11 @@ const PersonProfile: React.FC<Props> = ({ currentTab }) => {
           </TabsContent>
         )}
 
-        {/* {draftUserProfile && (
+        {draftUserProfile && (
           <TabsContent value="report">
           <ReportPage />
         </TabsContent>
-        )} */}
+        )}
       </Tabs>
     </div>
   );
