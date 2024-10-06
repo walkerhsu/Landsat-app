@@ -22,15 +22,7 @@ import { useUser, useClerk } from "@clerk/nextjs";
 import { useSignIn } from "@clerk/clerk-react";
 import { ProfileApi } from "@/apis/profile-api";
 import { PersonModel } from "@/models/person-model";
-// import { mockPerson } from "@/app/redux/info";
 import { LocationModel } from "@/models/location-model";
-<<<<<<< Updated upstream
-import ReportPage from "@/containers/profile-container/report";
-import { formatDate } from "@/lib/utils";
-=======
-import { Button } from "flowbite-react";
-// import ReportPage from "./report";
->>>>>>> Stashed changes
 
 const tabs = [
   { id: "overview", label: "Overview" },
