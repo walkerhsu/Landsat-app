@@ -50,9 +50,6 @@ const ExpandableButton: React.FC = () => {
       case "Sign Up":
         router.push("/sign-up");
         break;
-      case "Settings":
-        router.push("/settings");
-        break;
       case "Tutorial":
         dispatch(setShowTutorial(true));
         break;
