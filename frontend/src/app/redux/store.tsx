@@ -5,15 +5,17 @@ import dataAttributeReducer from "./dataAttribute-slice";
 import checkedItemsReducer from "./checkedItems-slice";
 import selectedDatasetReducer from "./selectedDataset-slice";
 import currentViewportReducer from "./current-viewport-slice";
+import srDataReducer from "./srData-slice";
 
 const store = configureStore({
   reducer: {
-    lll: personReducer,
+    person: personReducer,
     location: locationReducer,
     dataAttribute: dataAttributeReducer,
     checkedItems: checkedItemsReducer,
     selectedDataset: selectedDatasetReducer,
     currentViewport: currentViewportReducer,
+    srData: srDataReducer,
   },
 });
 

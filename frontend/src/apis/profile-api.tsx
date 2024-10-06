@@ -45,7 +45,6 @@ export class ProfileApi {
         status: string;
         id: string;
       };
-      console.log("in api", status, id);
       return [null, status];
     } catch (error: any) {
       return [new Error(error.message), null];

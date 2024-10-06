@@ -7,7 +7,7 @@ interface Timespan {
   endDate: string;
 }
 
-interface CloudCoverage {
+export interface CloudCoverage {
   min: number;
   max: number;
 }
@@ -42,7 +42,7 @@ const datasetSlice = createSlice({
           (location) => location !== action.payload
         );
       }
-      console.log(state.locations);
+      // console.log(state.locations);
     },
     setDatasetAttributeOfTimespan(state, action: PayloadAction<Timespan>) {
       state.timespan = action.payload;

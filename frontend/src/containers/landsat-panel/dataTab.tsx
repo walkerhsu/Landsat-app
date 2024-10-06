@@ -8,20 +8,22 @@ import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "@/app/redux/store";
 import { ITEMS } from "./mockData";
 import {
-  addLocation,
-  setCategory,
+  SelectedDatasetState,
+  setDatasetID,
   setLocation,
   setSource,
   setTime,
 } from "@/app/redux/selectedDataset-slice";
 import { MapModel } from "@/models/map-model";
-
+import { DatasetModel } from "@/models/dataset-model";
+import { TLocation } from "@/types";
 
 type DataProps = {
+  isEditMode: boolean;
   queryDataset: MapModel[];
 };
 
-const DataTab: React.FC<DataProps> = ({ queryDataset }) => {
+const DataTab: React.FC<DataProps> = ({ isEditMode, queryDataset }) => {
   // const dataAttribute = useSelector((state: RootState) => state.dataAttribute);
   const dispatch = useDispatch();
   const [selectedOptions, setSelectedOptions] = useState<{
@@ -51,14 +53,15 @@ const DataTab: React.FC<DataProps> = ({ queryDataset }) => {
 
   // const filteredDataset = handleFilteredItems(filteredItems);
 
-  const displayGridOnMap = (item: any, date: string) => {
+  const displayGridOnMap = (data: DatasetModel, location: TLocation) => {
     console.log(
-      `displaying grid on map for ${item.category} on ${date} ${item.geoJson.features.geometry}`
+      `displaying grid on map for ${data.getId()} on ${data.getDate()}`
     );
-    dispatch(setCategory(item.category));
-    dispatch(setLocation({ place: item.location, geoJsons: item.geoJson }));
-    dispatch(setSource(item.source));
-    dispatch(setTime(date));
+    // selectedDataset
+    dispatch(setDatasetID(data.getId()));
+    dispatch(setLocation(location));
+    // dispatch(setSource(data.source));
+    // dispatch(setTime(data.time));
   };
 
   return (
@@ -94,11 +97,19 @@ const DataTab: React.FC<DataProps> = ({ queryDataset }) => {
                     cursor: "pointer  ",
                   }}
                   key={data.getId()}
-                  onClick={() => displayGridOnMap(item, data.getDate())}
+                  onClick={() => displayGridOnMap(data, item.getLocation())}
                 >
                   <LsCheckbox
-                    checked={selectedOptions[item.getCollectionName()] === data.getDate()}
-                    onChange={() => handleOptionChange(item.getCollectionName(), data.getDate())}
+                    checked={
+                      selectedOptions[item.getCollectionName()] ===
+                      data.getDate()
+                    }
+                    onChange={() =>
+                      handleOptionChange(
+                        item.getCollectionName(),
+                        data.getDate()
+                      )
+                    }
                   />
                   <LsText key={data.getId()} size={LsFontSize.Sm}>
                     {data.getDate()}

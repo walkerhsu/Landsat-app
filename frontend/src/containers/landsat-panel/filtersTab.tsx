@@ -3,14 +3,22 @@ import { Datepicker } from "flowbite-react";
 import styles from "./styles/tab.module.css";
 import { LsText } from "@/components/LsText";
 import { Slider } from "@/components/magicui/slider";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import {
   setDatasetAttributeOfCloudCoverage,
   setDatasetAttributeOfTimespan,
 } from "@/app/redux/dataAttribute-slice";
 import { formatDate } from "@/lib/utils";
+import { RootState } from "@/app/redux/store";
 
-const FiltersTab: React.FC = () => {
+type FilterProps = {
+  isEditMode: boolean;
+};
+
+const FiltersTab: React.FC<FilterProps> = ({ isEditMode }) => {
+  const savedStartDate = useSelector(
+    (state: RootState) => state.dataAttribute.timespan.startDate
+  );
   const dispatch = useDispatch();
   const [cloudCoverage, setCloudCoverage] = useState([0, 100]); // Slider range for cloud coverage
   const [startDate, setStartDate] = useState<Date>(new Date());
@@ -26,20 +34,28 @@ const FiltersTab: React.FC = () => {
     );
   };
 
-  const handleSetStartDate = (date: Date) => {
-    setStartDate(date);
-    console.log("Start Date:", date);
-  };
-
-  const handleSetEndDate = (date: Date) => {
-    setEndDate(date);
+  const handleSetStartDate = (e) => {
+    console.log(e);
+    setStartDate(e);
     dispatch(
       setDatasetAttributeOfTimespan({
-        startDate: formatDate(startDate),
-        endDate: formatDate(date),
+        startDate: formatDate(e),
+        endDate: formatDate(e),
       })
     );
-    console.log("End Date:", date);
+    console.log("Start Date:", e);
+  };
+
+  const handleSetEndDate = (e) => {
+    // const { date } = e.target.value;
+    setEndDate(e);
+    dispatch(
+      setDatasetAttributeOfTimespan({
+        startDate: savedStartDate,
+        endDate: formatDate(e),
+      })
+    );
+    console.log("End Date:", e);
   };
 
   return (
@@ -88,7 +104,7 @@ const FiltersTab: React.FC = () => {
               <LsText>Start Date</LsText>
             </div>
             <Datepicker
-              onChange={() => handleSetStartDate}
+              onChange={handleSetStartDate}
               placeholder="Select start date"
             />
           </div>
@@ -97,7 +113,7 @@ const FiltersTab: React.FC = () => {
               <LsText>End Date</LsText>
             </div>
             <Datepicker
-              onChange={() => handleSetEndDate}
+              onChange={handleSetEndDate}
               minDate={startDate ? startDate : new Date()}
               placeholder="Select End date"
             />

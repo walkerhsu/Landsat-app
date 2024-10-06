@@ -32,32 +32,41 @@ const Panel: React.FC = () => {
   const [queryDataset, setQueryDataset] = useState<MapModel[]>([]);
   const [loading, setLoading] = useState(false);
 
-  const handleQueryDataset = useCallback(
-    () => async () => {
-      setLoading(true);
-      console.log("Querying dataset...");
+  const handleQueryDataset = useCallback(async () => {
+    console.log("Querying dataset...");
+    setLoading(true);
+    // try {
       const [error, returnedMapDataset] = await mapApi.fetchMapDatasets(
         dataAttributes.timespan.startDate,
         dataAttributes.timespan.endDate,
-        dataAttributes.locations
+        dataAttributes.locations,
+        // [
+        //   { lat: 0, lng: 0 },
+        //   { lat: 1, lng: 1 },
+        // ]
+        dataAttributes.cloudCoverage
       );
-      setLoading(false);
+
       console.log(error, returnedMapDataset);
+      setLoading(false);
+
       if (error) {
-        // notify users
-        console.error(error);
+        console.error("Error fetching dataset:", error);
         return error;
       }
+
       if (!returnedMapDataset) {
         console.log("Dataset not found");
         return null;
       }
+
       setQueryDataset(returnedMapDataset);
       toggleMode("read");
-      return null;
-    },
-    [mapApi, setQueryDataset, toggleMode]
-  );
+    // } catch (err) {
+    //   setLoading(false);
+    //   console.error("Unexpected error occurred:", err);
+    // }
+  }, [mapApi, dataAttributes, setQueryDataset, toggleMode]);
 
   const handleDownloadDataset = () => {
     console.log("Downloading dataset...");
@@ -86,9 +95,11 @@ const Panel: React.FC = () => {
         </div>
 
         {/* Conditional content rendering based on the active tab */}
-        {activeTab === TABS[0] && <FiltersTab />}
-        {activeTab === TABS[1] && <LocationsTab />}
-        {activeTab === TABS[2] && <DataTab queryDataset={queryDataset} />}
+        {activeTab === TABS[0] && <FiltersTab isEditMode={mode === "edit"} />}
+        {activeTab === TABS[1] && <LocationsTab isEditMode={mode === "edit"} />}
+        {activeTab === TABS[2] && (
+          <DataTab isEditMode={mode === "edit"} queryDataset={queryDataset} />
+        )}
 
         {/* Footer with Download Button */}
         {mode === "edit" && activeTab !== TABS[2] && (

@@ -4,7 +4,7 @@ export class LocationModel {
   constructor(
     private id: string,
     private place: string,
-    private latlng: { lat: number; lng: number },
+    private latlng: TLocation,
     private dataset: string,
     private addedDate: string
   ) {}
@@ -12,7 +12,7 @@ export class LocationModel {
   static create(
     id: string,
     place: string,
-    latlng: { lat: number; lng: number },
+    latlng: TLocation,
     dataset: string,
     addedDate: string
   ): LocationModel {

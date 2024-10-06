@@ -1,11 +1,25 @@
+import { TLocation } from "@/types";
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
+
+export interface SR_data {
+  color: string; // Hex color code as a string
+  ndvi: number; // Normalized Difference Vegetation Index
+  ndwi: number; // Normalized Difference Water Index
+  evi: number; // Enhanced Vegetation Index
+  savi: number; // Soil Adjusted Vegetation Index
+  ndmi: number; // Normalized Difference Moisture Index
+  nbr: number; // Normalized Burn Ratio
+  nbr2: number; // Second Normalized Burn Ratio
+  ndsi: number; // Normalized Difference Snow Index
+  temperature: number; // Temperature in Kelvin
+}
 
 export interface GeoJson {
   type: string;
   features: {
     type: string;
     properties: {
-      name: string;
+      SR_data: SR_data;
     };
     geometry: {
       type: string;
@@ -14,21 +28,16 @@ export interface GeoJson {
   }[];
 }
 
-interface Location {
-  place: string;
-  geoJsons: GeoJson;
-}
-
-interface SelectedDatasetState {
-  category: string;
-  locations: Location[];
+export interface SelectedDatasetState {
+  datasetID: string;
+  location: TLocation;
   source: string;
   time: string;
 }
 
 const initialState: SelectedDatasetState = {
-  category: "",
-  locations: [],
+  datasetID: "",
+  location: { lat: 25.123456, lng: 121.654321 },
   source: "",
   time: "",
 };
@@ -37,15 +46,11 @@ export const selectedDatasetSlice = createSlice({
   name: "selectedDataset",
   initialState,
   reducers: {
-    setCategory: (state, action: PayloadAction<string>) => {
-      state.category = action.payload;
+    setDatasetID: (state, action: PayloadAction<string>) => {
+      state.datasetID = action.payload;
     },
-    addLocation: (state, action: PayloadAction<Location>) => {
-      state.locations.push(action.payload);
-      console.log(state.locations);
-    },
-    setLocation: (state, action: PayloadAction<Location>) => {
-      state.locations = [action.payload];
+    setLocation: (state, action: PayloadAction<TLocation>) => {
+      state.location = action.payload;
     },
     setSource: (state, action: PayloadAction<string>) => {
       state.source = action.payload;
@@ -54,14 +59,14 @@ export const selectedDatasetSlice = createSlice({
       state.time = action.payload;
     },
     setAllFields: (state, action: PayloadAction<SelectedDatasetState>) => {
-      state.category = action.payload.category;
-      state.locations = action.payload.locations;
+      state.datasetID = action.payload.datasetID;
+      state.location = action.payload.location;
       state.source = action.payload.source;
       state.time = action.payload.time;
     },
     resetDataset: (state) => {
-      state.category = "";
-      state.locations = [];
+      state.datasetID = "";
+      state.location = { lat: 25.123456, lng: 121.654321 };
       state.source = "";
       state.time = "";
     },
@@ -69,8 +74,7 @@ export const selectedDatasetSlice = createSlice({
 });
 
 export const {
-  setCategory,
-  addLocation,
+  setDatasetID,
   setLocation,
   setSource,
   setTime,

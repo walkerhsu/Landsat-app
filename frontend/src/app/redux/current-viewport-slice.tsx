@@ -16,7 +16,7 @@ const viewportSlice = createSlice({
   initialState,
   reducers: {
     setViewport: (state, action: PayloadAction<CurrentViewportState>) => {
-      console.log(action.payload);
+    //   console.log(action.payload);
       state.center = action.payload.center;
       state.zoom = action.payload.zoom;
     },

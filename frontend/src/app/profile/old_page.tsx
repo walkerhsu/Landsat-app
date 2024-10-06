@@ -46,7 +46,7 @@ const ProfilePage = () => {
 
   const handleMapConfirm = () => {
     if (selectedLocation) {
-      console.log("selectedLocation", selectedLocation);
+      // console.log("selectedLocation", selectedLocation);
       setEditedProfile((prev) => ({
         ...prev,
         favoriteLocations: [selectedLocation, ...prev.favoriteLocations],

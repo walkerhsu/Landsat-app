@@ -128,7 +128,7 @@ class LandsatGridAnalyzer:
                     corner_x = pixel_center_x + (dx * pixel_size)
                     corner_y = pixel_center_y + (dy * pixel_size)
                     lon, lat = image_to_wgs84.transform(corner_x, corner_y)
-                    corners.append([lat, lon])
+                    corners.append([lon, lat])
                 corners.append(corners[0])
 
                 grid_corners.append(corners)

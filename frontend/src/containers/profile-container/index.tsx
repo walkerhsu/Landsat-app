@@ -2,7 +2,7 @@
 
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { useDispatch } from "react-redux";
-import { setEditablePerson } from "@/app/redux/person-slice";
+import { parsePersonModel, setEditablePerson } from "@/app/redux/person-slice";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { MapPin, Mail, Phone } from "lucide-react";
@@ -82,7 +82,7 @@ const PersonProfile: React.FC<Props> = ({ currentTab }) => {
     //   setUserProfile(mockPerson);
     // }
     if (userProfile) {
-      dispatch(setEditablePerson(userProfile));
+      dispatch(setEditablePerson(parsePersonModel(userProfile)));
     }
   }, [handlefetchUserProfile, signIn, user]);
 
@@ -102,7 +102,7 @@ const PersonProfile: React.FC<Props> = ({ currentTab }) => {
     // }
     setIsEditing(!isEditing);
     if (userProfile) {
-      dispatch(setEditablePerson(draftUserProfile));
+      dispatch(setEditablePerson(parsePersonModel(draftUserProfile)));
     }
     console.log("Profile successfully saved");
   }, [draftUserProfile, profileApi, handlefetchUserProfile]);
