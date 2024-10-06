@@ -12,6 +12,14 @@ export interface SR_data {
   nbr2: number; // Second Normalized Burn Ratio
   ndsi: number; // Normalized Difference Snow Index
   temperature: number; // Temperature in Kelvin
+  b1: number; // Band 1
+  b2: number; // Band 2
+  b3: number; // Band 3
+  b4: number; // Band 4
+  b5: number; // Band 5
+  b6: number; // Band 6
+  b7: number; // Band 7
+  b10: number; // Band 10
 }
 
 export interface GeoJson {

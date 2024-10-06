@@ -35,6 +35,9 @@ const ExpandableButton: React.FC = () => {
       case "Profile":
         router.push(`/profile`);
         break;
+      case "Report":
+          router.push(`/profile/report`);
+          break;
       case "Notifications":
         router.push(`/profile/${action.toLowerCase()}`);
         break;

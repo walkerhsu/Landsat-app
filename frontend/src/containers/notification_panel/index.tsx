@@ -11,6 +11,7 @@ const CountdownTimer = () => {
   const [landsatID, setLandsatID] = useState<string | null>(null);
   const [location, setLocation] = useState<string | null>(null);
   const { isSignedIn, user } = useUser();
+  const [userLocation, setUserLocation] = useState<string | null>(null);
 
   const person = useSelector((state: RootState) => state.person);
 
@@ -36,8 +37,9 @@ const CountdownTimer = () => {
   }, [targetDate]);
 
   useEffect(() => {
+    console.log(person);
     updateTargetDate();
-  }, [person.locationHistory]);
+  }, [person]);
 
   useEffect(() => {
     if (
@@ -53,10 +55,25 @@ const CountdownTimer = () => {
   const updateTargetDate = async () => {
     try {
       // Replace this with your actual API call
+      if (!isSignedIn || !user) {
+        return ;
+      }
+      const user_response = await fetch(`/api/profile/read/${user.id}`, {
+        method: "GET",
+        headers: { "Content-Type": "application/json" },
+      });
+      const user_data = await user_response.json();
+      console.log(user_data);
+
+      if (!user_data.locationHistory || user_data.locationHistory.length === 0) {
+        return ;
+      }
+      
+      console.log(person.locationHistory);
       const response = await fetch("/api/closestLandsatTime", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(person.locationHistory), // Add 1 minute
+        body: JSON.stringify(user_data.locationHistory), // Add 1 minute
       });
       const data = await response.json();
       let date = new Date(data.next_time);
@@ -77,13 +94,13 @@ const CountdownTimer = () => {
     }
   };
 
-  if (person.locationHistory.length === 0 || !isSignedIn) {
+  if (person.locationHistory.length === 0 || !isSignedIn || !user) {
     return (
       <div
         className="text-xl font-mono mb-4 text-white flex-wrap"
         style={{ textAlign: "center" }}
       >
-        Sign in and add location to view count down timer
+        Sign in and add location!
       </div>
     );
   }
@@ -94,7 +111,7 @@ const CountdownTimer = () => {
         className="text-l font-mono text-white flex-wrap"
         style={{ textAlign: "center" }}
       >
-        Landsat {landsatID} is going to pass over {location!} in:
+        Landsat {landsatID} is going to pass over {location} in:
       </div>
       <div className="text-3xl font-mono text-red-400">
         {timeLeft.days}D-{timeLeft.hours}h-{timeLeft.minutes}m-

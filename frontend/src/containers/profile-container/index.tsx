@@ -24,11 +24,12 @@ import { ProfileApi } from "@/apis/profile-api";
 import { PersonModel } from "@/models/person-model";
 // import { mockPerson } from "@/app/redux/info";
 import { LocationModel } from "@/models/location-model";
-import ReportPage from "./report";
+import ReportPage from "@/containers/profile-container/report";
+import { formatDate } from "@/lib/utils";
 
 const tabs = [
   { id: "overview", label: "Overview" },
-  { id: "notifications", label: "Notifications" },
+  { id: "report", label: "Report" },
 ];
 
 type Props = {
