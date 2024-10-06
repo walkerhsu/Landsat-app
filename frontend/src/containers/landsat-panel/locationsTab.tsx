@@ -23,6 +23,7 @@ import { Skeleton } from "@/components/magicui/skeleton";
 import { SkeletonDemo } from "../../components/skeleton-card";
 import { MapApi } from "@/apis/map-api";
 import { formatLocationId } from "../utils/format-locations";
+import { setFetchStatus } from "@/app/redux/fetchStatus-slice";
 
 const mockLocations = ["New York, USA", "Paris, France", "Tokyo, Japan"];
 const MAPBOX_TOKEN = process.env.NEXT_PUBLIC_MAPBOX_TOKEN!;
@@ -127,6 +128,7 @@ const LocationsPage: React.FC<LocationProps> = ({ isEditMode }) => {
     }
 
     if (userProfile) {
+      dispatch(setFetchStatus({isFetching: true}));
       let [error, status] = await profileApi.updateProfile(userProfile);
       console.log("Profile successfully updated");
       if (error) {
@@ -135,6 +137,7 @@ const LocationsPage: React.FC<LocationProps> = ({ isEditMode }) => {
         return;
       }
       setIsProcessingAddingLocation(false);
+      dispatch(setFetchStatus({isFetching: false}));
       return;
     }
     console.log("failed to update profile");

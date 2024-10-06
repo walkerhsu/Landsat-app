@@ -57,3 +57,8 @@
 .downloadButton:hover {
   background-color: var(--pink);
 }
+
+.downloadButton:disabled {
+  background-color: #ccc;
+  cursor: not-allowed;
+}

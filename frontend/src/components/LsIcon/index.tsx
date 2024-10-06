@@ -6,7 +6,7 @@ import { LsIconName } from "@/constants/ls-icon";
 interface Props {
   name: LsIconName;
   color?: LsColor;
-  size?: "24px" | "20px" | "16px" | "12px";
+  size?: "40px" | "28px" | "24px" | "20px" | "16px" | "12px";
 }
 
 export function LsIcon({ name, color = LsColor.White, size = "16px" }: Props) {
@@ -49,6 +49,15 @@ export function LsIcon({ name, color = LsColor.White, size = "16px" }: Props) {
       return (
         <Icon
           icon="eos-icons:three-dots-loading"
+          color={color}
+          fontSize={size}
+        />
+      );
+    case LsIconName.Loading:
+      // three dots loading in the middle of the screen in a circle
+      return (
+        <Icon
+          icon="eos-icons:bubble-loading"
           color={color}
           fontSize={size}
         />

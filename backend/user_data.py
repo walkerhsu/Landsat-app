@@ -28,7 +28,7 @@ class CloudCoverage(BaseModel):
 
 
 class SR_data(BaseModel):
-    color: list[int]
+    color: str
     ndvi: float
     ndwi: float
     evi: float

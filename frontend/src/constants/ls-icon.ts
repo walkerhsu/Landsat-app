@@ -6,6 +6,7 @@ export enum LsIconName {
     Search = 'search',
     Plus = 'plus',
     Processing = 'processing',
+    Loading = 'loading',
     Close = 'close',
     Edit = 'edit',
     Delete = 'delete',

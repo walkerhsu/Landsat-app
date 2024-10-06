@@ -7,6 +7,7 @@ import selectedDatasetReducer from "./selectedDataset-slice";
 import currentViewportReducer from "./current-viewport-slice";
 import srDataReducer from "./srData-slice";
 import tutorialReducer from "./tutorial-slice";
+import fetchStatusReducer from "./fetchStatus-slice";
 
 const store = configureStore({
   reducer: {
@@ -18,6 +19,7 @@ const store = configureStore({
     currentViewport: currentViewportReducer,
     srData: srDataReducer,
     tutorial: tutorialReducer,
+    fetchStatus: fetchStatusReducer,
   },
 });
 

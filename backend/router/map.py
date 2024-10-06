@@ -1,3 +1,4 @@
+import os
 from fastapi import APIRouter, HTTPException, Query
 from typing import List
 
@@ -58,28 +59,39 @@ class DownloadInput(BaseModel):
     download_data: PixelInput
 
 
-@map_router.post("/map/download")
-def download_dataset(input: DownloadInput):
+@map_router.get("/map/download/{datasetID}/{lat}/{lng}")
+def download_dataset(datasetID: str, lat: float, lng: float):
     try:
-        datasetID = input.download_data.datasetID
-        location = input.download_data.location
+        datasetID = datasetID.replace('*', '/')
+        location = LatLng(lat=lat, lng=lng)
         all_SR_data = landsat_grid_analyzer.download_dataset(datasetID, location)
         # write with csv format, header is the keys of the SR_data
         keys = ["index", "lat", "lng"] + list(all_SR_data[0].keys())
         filename = datasetID.replace("/", "_")
+        print(filename)
         with open(f"./{filename}.csv", "w") as f:
             f.write(",".join(keys) + "\n")
             for i in range(len(all_SR_data)):
                 row = [str(i + 1)] + [str(value) for value in all_SR_data[i].values()]
                 f.write(",".join(row) + "\n")
-        return {
-            "file": FileResponse(
-                f"./{filename}.csv",
-                media_type="application/octet-stream",
-                filename=f"{filename}.csv",
-            ),
-            "filename": filename,
-        }
+        headers = {'Access-Control-Expose-Headers': 'Content-Disposition'}
+        return FileResponse(
+            f"./{filename}.csv",
+            media_type="text/csv",
+            filename=f"{filename}.csv",
+            headers=headers
+        )
+
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=str(e))
+
+@map_router.get("/map/removeCSV/{datasetID}")
+def remove_csv_file(datasetID: str):
+    try:
+        datasetID = datasetID.replace('*', '/').replace('/', '_')
+        import os
+        os.remove(f"./{datasetID}.csv")
+        return {"message": "CSV file removed successfully"}
 
     except Exception as e:
         raise HTTPException(status_code=400, detail=str(e))
@@ -113,17 +125,22 @@ async def reverse_geocode(
 
     except Exception as e:
         raise HTTPException(status_code=400, detail=str(e))
-        raise HTTPException(status_code=400, detail=str(e)) 
 
 class LLMQueryInput(BaseModel):
-    API_KEY: str
     query: SR_data
 
-@map_router.get("/map/LLM_query")
+@map_router.post("/map/LLM_query")
 def LLM_query(
     input: LLMQueryInput
 ):
     try:
-        chat_completion(input.query, input.API_KEY)
+        try:
+            API_key = os.environ["OPENAI_API_KEY"]
+        except:
+            import dotenv
+            dotenv.load_dotenv()
+            API_key = os.environ["OPENAI_API_KEY"]
+            print(API_key)
+        return chat_completion(input.query, API_key)
     except Exception as e:
         raise HTTPException(status_code=400, detail=str(e)) 
