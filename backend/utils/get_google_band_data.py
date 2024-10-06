@@ -206,11 +206,13 @@ class LandsatGridAnalyzer:
         return tasks
 
     def get_pixel_data(self, datasetID, lat, lon):
+        max_value = 65455
         scene_bands = ee.Image(datasetID).select(L2_BANDS)
         point = ee.Geometry.Point(lon, lat)
         band_values = scene_bands.reduceRegion(
             geometry=point, reducer=ee.Reducer.mean(), scale=1, tileScale=16
         ).getInfo()
+        coastal = band_values["SR_B1"]
         blue = band_values["SR_B2"]
         green = band_values["SR_B3"]
         red = band_values["SR_B4"]
@@ -229,6 +231,14 @@ class LandsatGridAnalyzer:
             "nbr": self.get_nbr(nir, swir2),
             "nbr2": self.get_nbr2(swir, swir2),
             "ndsi": self.get_ndsi(green, swir),
+            "b1": coastal / max_value,
+            "b2": blue / max_value,
+            "b3": green / max_value,
+            "b4": red / max_value,
+            "b5": nir / max_value,
+            "b6": swir / max_value,
+            "b7": swir2 / max_value,
+            "b10": tirs1 / max_value,
             "temperature": temp
         }
         return SR_data
