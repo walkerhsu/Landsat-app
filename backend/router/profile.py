@@ -25,7 +25,7 @@ async def read_profile(user_id: str):
         
         return data.to_dict()
     except Exception as e:
-        raise HTTPException(status_code=404, detail=str(e))
+        raise HTTPException(status_code=500, detail=str(e))
 
 
 @profile_router.post("/profile/save")
@@ -33,13 +33,16 @@ async def save_profile(user_data: UserData):
     
     try:
         doc = db.collection('users').document(user_data.id)
+        data = doc.get()
+        if data.exists:
+            raise HTTPException(status_code=404, detail="User already exists")
         doc.set(user_data.model_dump())
         user_data = user_data.model_dump()
         user_data['status'] = "saved"
         
         return {"status": "saved", "id": user_data['id']}
     except Exception as e:
-        raise HTTPException(status_code=404, detail=str(e))
+        raise HTTPException(status_code=500, detail=str(e))
 
 
 
@@ -50,7 +53,7 @@ async def update_profile(user_data: UserData):
         doc.update(user_data.model_dump())
         return {"status": "updated", "id": user_data.id}
     except Exception as e:
-        raise HTTPException(status_code=404, detail=str(e))
+        raise HTTPException(status_code=500, detail=str(e))
     
 @profile_router.delete("/profile/delete/{user_id}")
 async def delete_profile(user_id: str):
@@ -59,4 +62,4 @@ async def delete_profile(user_id: str):
         doc.delete()
         return {"status": "deleted", "id": user_id}
     except Exception as e:
-        raise HTTPException(status_code=404, detail=str(e))
+        raise HTTPException(status_code=500, detail=str(e))

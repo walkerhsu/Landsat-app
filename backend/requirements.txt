@@ -5,3 +5,7 @@ fastapi
 firebase-admin
 pyproj==3.7.0
 openai
+geopandas
+shapely
+pyproj
+httpx

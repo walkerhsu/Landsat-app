@@ -1,6 +1,7 @@
 from fastapi import FastAPI
 from router.profile import profile_router
 from router.map import map_router
+from router.timer import timer_router
 
 app = FastAPI()
 
@@ -11,6 +12,7 @@ def read_root():
 # Include the routers
 app.include_router(profile_router, prefix="/api")
 app.include_router(map_router, prefix="/api")
+app.include_router(timer_router, prefix="/api")
 
 if __name__ == '__main__':
     import uvicorn
