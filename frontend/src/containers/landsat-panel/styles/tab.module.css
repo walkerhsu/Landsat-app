@@ -39,3 +39,21 @@
   margin-left: 16px;
   cursor: pointer;
 }
+
+.downloadButton {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 0.5em;
+  background-color: var(--dark-pink);
+  color: white;
+  padding: 10px;
+  border: none;
+  cursor: pointer;
+  font-size: 14px;
+  border-radius: 10px;
+}
+
+.downloadButton:hover {
+  background-color: var(--pink);
+}

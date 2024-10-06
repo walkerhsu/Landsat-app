@@ -5,7 +5,6 @@ import { LsText } from "@/components/LsText";
 import { NoContentSection } from "@/components/no-content-section";
 import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "@/app/redux/store";
-import { removeLocation } from "@/app/redux/person-slice";
 import { LsColor } from "@/constants/ls-color";
 import { setLatLng } from "@/app/redux/location-slice";
 import { setDatasetAttributeOfLocations } from "@/app/redux/dataAttribute-slice";
@@ -23,6 +22,7 @@ import { formatDate } from "@/lib/utils";
 import { Skeleton } from "@/components/magicui/skeleton";
 import { SkeletonDemo } from "../../components/skeleton-card";
 import { MapApi } from "@/apis/map-api";
+import { formatLocationId } from "../utils/format-locations";
 
 const mockLocations = ["New York, USA", "Paris, France", "Tokyo, Japan"];
 const MAPBOX_TOKEN = process.env.NEXT_PUBLIC_MAPBOX_TOKEN!;
@@ -51,6 +51,9 @@ const LocationsPage: React.FC<LocationProps> = ({ isEditMode }) => {
   const [userLocation, setUserLocation] = useState<LocationModel[] | null>(
     null
   );
+
+  const [isProcessingAddingLocation, setIsProcessingAddingLocation] =
+    useState<boolean>(false);
 
   const [isloading, setIsLoading] = useState<boolean>(false);
 
@@ -91,6 +94,7 @@ const LocationsPage: React.FC<LocationProps> = ({ isEditMode }) => {
     if (!currentViewport) {
       return;
     }
+    setIsProcessingAddingLocation(true);
     if (userProfile) {
       const newUserProfile: PersonModel = userProfile;
       const fullAddress = await mapApi.getReverseGeocode(
@@ -99,7 +103,9 @@ const LocationsPage: React.FC<LocationProps> = ({ isEditMode }) => {
         MAPBOX_TOKEN
       );
       console.log(fullAddress);
-      const address = fullAddress?.features?.[0]?.properties?.full_address || "Address not found";
+      const address =
+        fullAddress?.features?.[0]?.properties?.full_address ||
+        "Address not found";
       newUserProfile.pushLocationHistory(
         LocationModel.create(
           `${currentViewport.center.lat}+${currentViewport.center.lng}`,
@@ -120,17 +126,15 @@ const LocationsPage: React.FC<LocationProps> = ({ isEditMode }) => {
       });
     }
 
-    // console.log(currentViewport);
-    // console.log(userProfile);
-    // console.log(userLocation);
-
     if (userProfile) {
       let [error, status] = await profileApi.updateProfile(userProfile);
       console.log("Profile successfully updated");
       if (error) {
         console.error("Failed to update profile");
+        setIsProcessingAddingLocation(false);
         return;
       }
+      setIsProcessingAddingLocation(false);
       return;
     }
     console.log("failed to update profile");
@@ -162,27 +166,35 @@ const LocationsPage: React.FC<LocationProps> = ({ isEditMode }) => {
         style={{
           display: "flex",
           width: "90%",
-          justifyContent: "space-between",
+          justifyContent: "center",
+          alignItems: "center",
+          gap: "2rem",
           marginBottom: "1rem",
         }}
       >
         <LsText>Saved Locations</LsText>
-        <button
-          onClick={handleAddLocations}
-          style={{
-            width: "24px",
-            height: "24px",
-            display: "flex",
-            justifyContent: "center",
-            alignItems: "center",
-            backgroundColor: addHovered ? LsColor.Grey600 : "transparent",
-            borderRadius: "50%",
-          }}
-          onMouseEnter={() => setAddHovered(true)}
-          onMouseLeave={() => setAddHovered(false)}
-        >
-          <LsIcon name={LsIconName.Plus} />
-        </button>
+        {isEditMode ? (
+          <button
+            onClick={handleAddLocations}
+            style={{
+              width: "28px",
+              height: "28px",
+              display: "flex",
+              justifyContent: "center",
+              alignItems: "center",
+              backgroundColor: addHovered ? LsColor.Grey600 : "transparent",
+              borderRadius: "50%",
+            }}
+            onMouseEnter={() => setAddHovered(true)}
+            onMouseLeave={() => setAddHovered(false)}
+          >
+            {isProcessingAddingLocation ? (
+              <LsIcon name={LsIconName.Processing}></LsIcon>
+            ) : (
+              <LsIcon name={LsIconName.Plus} />
+            )}
+          </button>
+        ) : null}
       </div>
 
       {/* Location Search Bar */}
@@ -198,23 +210,28 @@ const LocationsPage: React.FC<LocationProps> = ({ isEditMode }) => {
         /> */}
 
       {/* List of Favorite Locations */}
-      {isloading && <SkeletonDemo />}
-      {userLocation && (
+      {/* {isloading && <SkeletonDemo />} */}
+      {
         <div className={styles.locationList}>
           <div className="flex justify-center">
             <ListGroup className="w-full bg-transparent">
-              {userLocation.length > 0 ? (
+              {userLocation && userLocation.length > 0 ? (
                 userLocation.map((location, index) => (
                   <ListGroupItem
                     key={index}
-                    style={{ display: "flex", justifyContent: "space-between" }}
+                    style={{
+                      display: "flex",
+                      justifyContent: "space-between",
+                      transition: "transform 0.5s ease",
+                      transform: "translateY(-5px)",
+                    }}
                     onClick={() => handleViewportChange(location.getLatlng())}
                     onMouseEnter={(e) => {
-                      e.stopPropagation();
+                      // e.stopPropagation();
                       setHoveredItem(location.getPlace());
                     }}
                     onMouseOut={(e) => {
-                      e.stopPropagation();
+                      // e.stopPropagation();
                       setHoveredItem("");
                     }}
                   >
@@ -228,14 +245,49 @@ const LocationsPage: React.FC<LocationProps> = ({ isEditMode }) => {
                       {location.getPlace()}
                     </LsText>
                     <LsCheckbox
-                      checked={checkedItems.checkedItems.includes(
-                        location.getPlace()
-                      )}
+                      checked={
+                        isEditMode
+                          ? checkedItems.checkedItems.includes(
+                              formatLocationId(
+                                location.getLatlng().lat,
+                                location.getLatlng().lng
+                              )
+                            )
+                          : checkedItems.checkedItems.length === 1 &&
+                            checkedItems.checkedItems[0] ===
+                              formatLocationId(
+                                location.getLatlng().lat,
+                                location.getLatlng().lng
+                              )
+                      }
                       onChange={() => {
-                        dispatch(toggleCheckedItem(location.getPlace()));
-                        dispatch(
-                          setDatasetAttributeOfLocations(location.getLatlng())
-                        );
+                        if (!isEditMode) {
+                          // Clear all selections and select the new one
+                          dispatch(
+                            toggleCheckedItem({
+                              item: formatLocationId(
+                                location.getLatlng().lat,
+                                location.getLatlng().lng
+                              ),
+                              clear: true,
+                            })
+                          );
+                        } else {
+                          // Multi-select in edit mode
+                          dispatch(
+                            toggleCheckedItem({
+                              item: formatLocationId(
+                                location.getLatlng().lat,
+                                location.getLatlng().lng
+                              ),
+                            })
+                          );
+                        }
+                        if (isEditMode) {
+                          dispatch(
+                            setDatasetAttributeOfLocations(location.getLatlng())
+                          );
+                        }
                       }}
                     />
                   </ListGroupItem>
@@ -246,7 +298,7 @@ const LocationsPage: React.FC<LocationProps> = ({ isEditMode }) => {
             </ListGroup>
           </div>
         </div>
-      )}
+      }
     </div>
   );
 };
