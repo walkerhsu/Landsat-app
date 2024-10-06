@@ -1,5 +1,6 @@
 import { TLocation } from "@/types";
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
+<<<<<<< Updated upstream
 
 export interface SR_data {
   color: string; // Hex color code as a string
@@ -21,6 +22,9 @@ export interface SR_data {
   b7: number; // Band 7
   b10: number; // Band 10
 }
+=======
+import { SR_data } from "./srData-slice";
+>>>>>>> Stashed changes
 
 export interface GeoJson {
   type: string;
@@ -60,23 +64,9 @@ export const selectedDatasetSlice = createSlice({
     setLocation: (state, action: PayloadAction<TLocation>) => {
       state.location = action.payload;
     },
-    // setSource: (state, action: PayloadAction<string>) => {
-    //   state.source = action.payload;
-    // },
-    // setTime: (state, action: PayloadAction<string>) => {
-    //   state.time = action.payload;
-    // },
-    // setAllFields: (state, action: PayloadAction<SelectedDatasetState>) => {
-    //   state.datasetID = action.payload.datasetID;
-    //   state.location = action.payload.location;
-    //   state.source = action.payload.source;
-    //   state.time = action.payload.time;
-    // },
     resetDataset: (state) => {
       state.datasetID = "";
       state.location = { lat: 25.123456, lng: 121.654321 };
-      // state.source = "";
-      // state.time = "";
     },
   },
 });
@@ -84,9 +74,6 @@ export const selectedDatasetSlice = createSlice({
 export const {
   setDatasetID,
   setLocation,
-  // setSource,
-  // setTime,
-  // setAllFields,
   resetDataset,
 } = selectedDatasetSlice.actions;
 

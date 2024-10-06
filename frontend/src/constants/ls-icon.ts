@@ -24,5 +24,6 @@ export enum LsIconName {
     Hide = 'hide',
     Logout = "Logout",
     Save = "Save",
+    Back = "Back",
   }
   

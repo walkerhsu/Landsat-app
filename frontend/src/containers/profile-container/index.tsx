@@ -24,8 +24,13 @@ import { ProfileApi } from "@/apis/profile-api";
 import { PersonModel } from "@/models/person-model";
 // import { mockPerson } from "@/app/redux/info";
 import { LocationModel } from "@/models/location-model";
+<<<<<<< Updated upstream
 import ReportPage from "@/containers/profile-container/report";
 import { formatDate } from "@/lib/utils";
+=======
+import { Button } from "flowbite-react";
+// import ReportPage from "./report";
+>>>>>>> Stashed changes
 
 const tabs = [
   { id: "overview", label: "Overview" },
@@ -220,7 +225,15 @@ const PersonProfile: React.FC<Props> = ({ currentTab }) => {
   return (
     <div className="w-full mx-auto p-6 bg-black text-gray-100 min-h-screen">
       <div className="flex justify-between items-center mb-6">
-        <h1 className="text-2xl font-semibold text-white">Profile</h1>
+        <div style={{ display: "flex", flexDirection: "row", gap: "1rem" }}>
+          <button
+            className="bg-black hover:bg-gray-700 text-white px-4 py-2 rounded-md flex gap-2"
+            onClick={() => router.push("/")}
+          >
+            <LsIcon name={LsIconName.Back} />
+          </button>
+          <h1 className="text-2xl font-semibold text-white">Profile</h1>
+        </div>
         <button
           className="bg-black hover:bg-gray-700 text-white px-4 py-2 rounded-md flex gap-2"
           onClick={() => signOut({ redirectUrl: "/" })}
@@ -435,9 +448,6 @@ const PersonProfile: React.FC<Props> = ({ currentTab }) => {
                     <h3 className="text-xl font-semibold text-white">
                       Favorite Locations
                     </h3>
-                    <button className="text-blue-400 hover:text-blue-300">
-                      + Add Info
-                    </button>
                   </div>
                   <Card className="bg-black border-gray-700">
                     <CardContent className="p-0">
@@ -446,7 +456,6 @@ const PersonProfile: React.FC<Props> = ({ currentTab }) => {
                           <tr className="text-left text-gray-400 border-b border-gray-700">
                             <th className="px-6 py-3">PLACE</th>
                             <th className="px-6 py-3">LATLNG</th>
-                            <th className="px-6 py-3">DATASET</th>
                             <th className="px-6 py-3">ADDED DATE</th>
                             <th className="px-6 py-3"></th>
                           </tr>
@@ -466,9 +475,6 @@ const PersonProfile: React.FC<Props> = ({ currentTab }) => {
                                   {location.getLatlng().lat.toString() +
                                     ", " +
                                     location.getLatlng().lng.toString()}
-                                </td>
-                                <td className="px-6 py-4 text-gray-300">
-                                  {location.getDataset()}
                                 </td>
                                 <td className="px-6 py-4 text-gray-300">
                                   {location.getAddedDate()}
@@ -552,15 +558,13 @@ const PersonProfile: React.FC<Props> = ({ currentTab }) => {
               </div>
             </div>
           </TabsContent>
-          
-          
         )}
 
-        {draftUserProfile && (
+        {/* {draftUserProfile && (
           <TabsContent value="report">
           <ReportPage />
         </TabsContent>
-        )}
+        )} */}
       </Tabs>
     </div>
   );
