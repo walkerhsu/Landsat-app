@@ -22,6 +22,7 @@ import { calcGeoJson } from "../utils/calc-geojson";
 import { setSRData } from "@/app/redux/srData-slice";
 import { setShowTutorial } from "@/app/redux/tutorial-slice";
 import Tutorial from "@/components/tutorial";
+import { setFetchStatus } from "@/app/redux/fetchStatus-slice";
 
 const MAPBOX_TOKEN = process.env.NEXT_PUBLIC_MAPBOX_TOKEN!;
 
@@ -42,6 +43,7 @@ interface IAllGridsCoordinates {
 
 export default function Mapbox({ location, onLocationSelect }: IMapboxProps) {
   const tutorial = useSelector((state: RootState) => state.tutorial);
+  const fetchStatus = useSelector((state: RootState) => state.fetchStatus);
   const mapApi = useMemo(() => new MapApi(), []);
   const viewport = useSelector((state: RootState) => state.currentViewport);
   const dispatch = useDispatch();
@@ -134,6 +136,7 @@ export default function Mapbox({ location, onLocationSelect }: IMapboxProps) {
   const handleFetchGeoJson = useCallback(async () => {
     console.log(selectedDataset);
     if (!selectedDataset) return;
+    dispatch(setFetchStatus({ isFetching: true }));
     const [error, returnedGeoJson] = await mapApi.fetchGeoJson(
       selectedDataset.datasetID,
       selectedDataset.location
@@ -143,6 +146,7 @@ export default function Mapbox({ location, onLocationSelect }: IMapboxProps) {
       return;
     }
     setAllGeoJsons(returnedGeoJson);
+    dispatch(setFetchStatus({ isFetching: false }));
     handleViewportChange({
       latitude: selectedDataset.location.lat,
       longitude: selectedDataset.location.lng,

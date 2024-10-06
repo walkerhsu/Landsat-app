@@ -29,11 +29,18 @@ const DataTab: React.FC<DataProps> = ({ isEditMode, queryDataset }) => {
   );
   const dispatch = useDispatch();
   const [checkedDatasetId, setCheckedDatasetId] = useState<string | null>(null);
-
   const [searchTerm, setSearchTerm] = useState<string>("");
-
   const [hovered, setHovered] = useState<string>("");
 
+  // TOGGLE CHECKED DATASET ID
+  const toggleCheckedDatasetId = (id: string, location: TLocation) => {
+    if (checkedDatasetId === id) {
+      setCheckedDatasetId(null);
+    } else {
+      displayGridOnMap(id, location)
+      setCheckedDatasetId(id);
+    }
+  };
   // DOWNLOAD
   const handleDownloadDataset = useCallback(
     async (datasetLocation: DatasetLocation) => {
@@ -86,6 +93,8 @@ const DataTab: React.FC<DataProps> = ({ isEditMode, queryDataset }) => {
 
     console.log(queryDataset, uniqueFilteredDatasets, checkedItems);
   }, [checkedItems]);
+
+
 
   return (
     <div
@@ -152,7 +161,7 @@ const DataTab: React.FC<DataProps> = ({ isEditMode, queryDataset }) => {
                   </LsText>
                   <LsCheckbox
                     checked={checkedDatasetId === data.getId()}
-                    onChange={() => setCheckedDatasetId(data.getId())}
+                    onChange={() => toggleCheckedDatasetId(data.getId(), location.getLocation())}
                   />
                 </div>
               ))}
@@ -172,6 +181,7 @@ const DataTab: React.FC<DataProps> = ({ isEditMode, queryDataset }) => {
         >
           <button
             className={styles.downloadButton}
+            disabled={!checkedDatasetId}
             onClick={() =>
               handleDownloadDataset({
                 datasetID: checkedDatasetId!,

@@ -80,30 +80,30 @@ export class MapApi {
   ): Promise<Error | null> {
     const data = { download_data: datesetLocation };
     try {
-      const response = await fetch("/api/map/download", {
-        method: "POST",
+      const replaced_datasetID = datesetLocation.datasetID.replace(/\//g, "*");
+      const response = await fetch("/api/map/download/" + replaced_datasetID + "/" + datesetLocation.location.lat + "/" + datesetLocation.location.lng, {
+        method: "GET",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify(data),
       });
 
-      const { file, filename } = await response.json();
-
-      if (file && filename) {
-        console.log("Downloading file: " + filename);
-
-        // Assuming the file is a base64 encoded string
-        const byteCharacters = atob(file);
-        console.log(byteCharacters);
-        const byteNumbers = new Array(byteCharacters.length);
-        for (let i = 0; i < byteCharacters.length; i++) {
-          byteNumbers[i] = byteCharacters.charCodeAt(i);
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+        // console.log("Downloading file: " + filename);
+        console.log(response);
+        const blob = await response.blob();
+        const contentDisposition = response.headers.get('content-disposition');
+        let filename = 'download.csv';
+    
+        if (contentDisposition) {
+          const filenameMatch = contentDisposition.match(/filename="?(.+?)"?(?:;|$)/i);
+          if (filenameMatch) {
+            filename = filenameMatch[1];
+          }
         }
-        const byteArray = new Uint8Array(byteNumbers);
-        const blob = new Blob([byteArray], {
-          type: "application/octet-stream",
-        });
+        console.log(filename)
 
         const url = window.URL.createObjectURL(blob);
         const link = document.createElement("a");
@@ -117,10 +117,13 @@ export class MapApi {
         window.URL.revokeObjectURL(url);
 
         console.log("Successfully downloaded file");
+        await fetch("/api/map/removeCSV/" + replaced_datasetID, {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+          },
+        });
         return null;
-      } else {
-        throw new Error("File data or filename is missing in the response");
-      }
     } catch (error: any) {
       return new Error(error.message);
     }
