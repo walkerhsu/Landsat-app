@@ -5,14 +5,17 @@ import { LsIcon } from "../../components/LsIcon";
 import { LsIconName } from "@/constants/ls-icon";
 import { useRouter } from "next/navigation";
 import { useClerk, useUser } from "@clerk/clerk-react";
+import { useDispatch } from "react-redux";
+import { setShowTutorial } from "@/app/redux/tutorial-slice";
 
 const Routes = [
   "Profile",
   "Notifications",
+  "Report",
+  "Tutorial",
   "Sign In",
   "Sign Up",
   "Log Out",
-  "Report",
 ];
 
 const ExpandableButton: React.FC = () => {
@@ -20,6 +23,8 @@ const ExpandableButton: React.FC = () => {
   const { signOut } = useClerk();
   const router = useRouter();
   const [isExpanded, setIsExpanded] = useState(false);
+  const dispatch = useDispatch();
+  
 
   const toggleExpand = () => {
     setIsExpanded(!isExpanded);
@@ -44,6 +49,9 @@ const ExpandableButton: React.FC = () => {
         break;
       case "Settings":
         router.push("/settings");
+        break;
+      case "Tutorial":
+        dispatch(setShowTutorial(true));
         break;
       default:
         break;

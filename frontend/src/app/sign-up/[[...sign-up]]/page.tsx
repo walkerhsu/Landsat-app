@@ -10,7 +10,7 @@ const SignUpPage = () => {
         height: "100vh",
       }}
     >
-      <SignUp />
+      <SignUp forceRedirectUrl="/loading" />
     </div>
   );
 };

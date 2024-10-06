@@ -20,6 +20,8 @@ import { MapApi } from "@/apis/map-api";
 import { SkeletonCard } from "../../components/skeleton-card";
 import { calcGeoJson } from "../utils/calc-geojson";
 import { setSRData } from "@/app/redux/srData-slice";
+import { setShowTutorial } from "@/app/redux/tutorial-slice";
+import Tutorial from "@/components/tutorial";
 
 const MAPBOX_TOKEN = process.env.NEXT_PUBLIC_MAPBOX_TOKEN!;
 
@@ -39,6 +41,7 @@ interface IAllGridsCoordinates {
 }
 
 export default function Mapbox({ location, onLocationSelect }: IMapboxProps) {
+  const tutorial = useSelector((state: RootState) => state.tutorial);
   const mapApi = useMemo(() => new MapApi(), []);
   const viewport = useSelector((state: RootState) => state.currentViewport);
   const dispatch = useDispatch();
@@ -172,7 +175,7 @@ export default function Mapbox({ location, onLocationSelect }: IMapboxProps) {
     // console.log(selectedDataset);
     // setAllData([mockGeoJson]);
     // fetchGeoJson();
-    console.log(selectedDataset)
+    console.log(selectedDataset);
     if (selectedDataset.datasetID.length && selectedDataset.location) {
       handleFetchGeoJson();
     }
@@ -192,30 +195,37 @@ export default function Mapbox({ location, onLocationSelect }: IMapboxProps) {
       {isloading ? (
         <SkeletonCard />
       ) : (
-        <MapGL
-          ref={mapRef}
-          mapboxAccessToken={MAPBOX_TOKEN}
-          initialViewState={initviewport}
-          mapStyle="mapbox://styles/mapbox/standard-satellite"
-          onClick={handleMapClick}
-          onLoad={handleMapLoad}
-        >
-          {/* {allGeoJsonsData && ( */}
-          {/* <div onClick={() => console.log("clicked")}> */}
-          <Source type="geojson" data={allGeoJsonsData}>
-            <Layer {...dataLayer} />
-          </Source>
-          {/* </div> */}
-          {/* )} */}
+        <>
+          <MapGL
+            ref={mapRef}
+            mapboxAccessToken={MAPBOX_TOKEN}
+            initialViewState={initviewport}
+            mapStyle="mapbox://styles/mapbox/standard-satellite"
+            onClick={handleMapClick}
+            onLoad={handleMapLoad}
+          >
+            {/* {allGeoJsonsData && ( */}
+            {/* <div onClick={() => console.log("clicked")}> */}
+            {!isloading && allGeoJsonsData && (
+              <Source type="geojson" data={allGeoJsonsData}>
+                <Layer {...dataLayer} />
+              </Source>
+            )}
+            {/* </div> */}
+            {/* )} */}
 
-          {showMarker && location && (
-            <Marker
-              longitude={viewport.center.lng}
-              latitude={viewport.center.lat}
-              color="red"
-            />
+            {showMarker && location && (
+              <Marker
+                longitude={viewport.center.lng}
+                latitude={viewport.center.lat}
+                color="red"
+              />
+            )}
+          </MapGL>
+          {tutorial.showTutorial && (
+            <Tutorial onClose={() => dispatch(setShowTutorial(false))} />
           )}
-        </MapGL>
+        </>
       )}
     </>
   );
