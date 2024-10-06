@@ -7,13 +7,7 @@ import { NoContentSection } from "@/components/no-content-section";
 import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "@/app/redux/store";
 import { ITEMS } from "./mockData";
-import {
-  SelectedDatasetState,
-  setDatasetID,
-  setLocation,
-  setSource,
-  setTime,
-} from "@/app/redux/selectedDataset-slice";
+import { setDatasetID, setLocation } from "@/app/redux/selectedDataset-slice";
 import { MapModel } from "@/models/map-model";
 import { DatasetModel } from "@/models/dataset-model";
 import { TLocation } from "@/types";
@@ -46,10 +40,10 @@ const DataTab: React.FC<DataProps> = ({ isEditMode, queryDataset }) => {
   //   return matchesCategory && matchesLocation;
   // });
 
-  const handleFilteredItems = (items: typeof ITEMS) => {
-    console.log("Filtered Items:", items);
-    return items;
-  };
+  // const handleFilteredItems = (items: typeof ITEMS) => {
+  //   console.log("Filtered Items:", items);
+  //   return items;
+  // };
 
   // const filteredDataset = handleFilteredItems(filteredItems);
 
@@ -84,7 +78,7 @@ const DataTab: React.FC<DataProps> = ({ isEditMode, queryDataset }) => {
       <div style={{ flexGrow: "1", maxHeight: "25rem", overflowY: "auto" }}>
         {queryDataset.length > 0 ? (
           queryDataset.map((item) => (
-            <div key={item.getDataset()[0].getId()} className={styles.item}>
+            <div key={item.getDataset()?.[0]?.getId()} className={styles.item}>
               <LsText>{item.getCollectionName()}</LsText>
               {/* <LsText size={LsFontSize.Sm}>{item.source}</LsText> */}
               {item.getDataset().map((data) => (

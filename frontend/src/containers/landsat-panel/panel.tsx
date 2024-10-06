@@ -18,138 +18,144 @@ const TABS = ["Filters", "Locations", "Data"];
 const Panel: React.FC = () => {
   const dataAttributes = useSelector((state: RootState) => state.dataAttribute);
   const mapApi = useMemo(() => MapApi.create(), []);
-  const [activeTab, setActiveTab] = useState("Data");
-  const [mode, setMode] = useState<"edit" | "read">("read");
+  const [activeTab, setActiveTab] = useState("Filters");
+  const [mode, setMode] = useState<"edit" | "read">("edit");
+  const [queryDataset, setQueryDataset] = useState<MapModel[]>([]);
+  const [loading, setLoading] = useState(false);
 
   const handleTabClick = (tab: string) => {
-    setActiveTab(tab);
+    if (mode === "edit") {
+      setActiveTab(tab);
+    }
   };
 
   const toggleMode = (newMode: "edit" | "read") => {
     setMode(newMode);
   };
 
-  const [queryDataset, setQueryDataset] = useState<MapModel[]>([]);
-  const [loading, setLoading] = useState(false);
-
   const handleQueryDataset = useCallback(async () => {
     console.log("Querying dataset...");
     setLoading(true);
-    // try {
-      const [error, returnedMapDataset] = await mapApi.fetchMapDatasets(
-        dataAttributes.timespan.startDate,
-        dataAttributes.timespan.endDate,
-        dataAttributes.locations,
-        // [
-        //   { lat: 0, lng: 0 },
-        //   { lat: 1, lng: 1 },
-        // ]
-        dataAttributes.cloudCoverage
-      );
+    const [error, returnedMapDataset] = await mapApi.fetchMapDatasets(
+      dataAttributes.timespan.startDate,
+      dataAttributes.timespan.endDate,
+      dataAttributes.locations,
+      dataAttributes.cloudCoverage
+    );
 
-      console.log(error, returnedMapDataset);
-      setLoading(false);
+    setLoading(false);
 
-      if (error) {
-        console.error("Error fetching dataset:", error);
-        return error;
-      }
+    if (error) {
+      console.error("Error fetching dataset:", error);
+      return error;
+    }
 
-      if (!returnedMapDataset) {
-        console.log("Dataset not found");
-        return null;
-      }
+    if (!returnedMapDataset) {
+      console.log("Dataset not found");
+      return null;
+    }
 
-      setQueryDataset(returnedMapDataset);
-      toggleMode("read");
-    // } catch (err) {
-    //   setLoading(false);
-    //   console.error("Unexpected error occurred:", err);
-    // }
+    setQueryDataset(returnedMapDataset);
+    toggleMode("read");
   }, [mapApi, dataAttributes, setQueryDataset, toggleMode]);
 
   const handleDownloadDataset = () => {
     console.log("Downloading dataset...");
   };
 
+  const renderEditMode = () => (
+    <>
+      <div className={styles.tabs}>
+        {TABS.slice(0, 2).map((tab) => (
+          <button
+            key={tab}
+            className={`${styles.tabButton} ${
+              activeTab === tab ? styles.active : ""
+            }`}
+            onClick={() => handleTabClick(tab)}
+          >
+            <LsText color={activeTab === tab ? LsColor.White : LsColor.Grey400}>
+              {tab}
+            </LsText>
+          </button>
+        ))}
+      </div>
+      {activeTab === TABS[0] && <FiltersTab isEditMode={true} />}
+      {activeTab === TABS[1] && <LocationsTab isEditMode={true} />}
+      {/* {activeTab === TABS[2] && (
+        <DataTab isEditMode={true} queryDataset={queryDataset} />
+      )} */}
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "center",
+          paddingTop: "10px",
+        }}
+      >
+        {loading ? (
+          <LsIcon name={LsIconName.Processing} />
+        ) : (
+          <button className={styles.queryButton} onClick={handleQueryDataset}>
+            <LsIcon
+              name={LsIconName.Search}
+              color={LsColor.White}
+              size={"24px"}
+            />
+            <LsText>Query Dataset</LsText>
+          </button>
+        )}
+      </div>
+    </>
+  );
+
+  const renderReadMode = () => (
+    <>
+      {/* <div style={{ display: "flex", width: "30rem" }}></div> */}
+      <div
+        style={{
+          display: "grid",
+          width: "45vw",
+          height: '50vh',
+          padding: `${8}px`,
+          gridTemplateColumns: `repeat(${2}, 1fr)`,
+          flexFlow: "column wrap",
+          gap: `${24}px`,
+          overflow: 'auto',
+          overflowWrap: "break-word",
+        }}
+      >
+        {/* <div style={{ display: "flex", flexDirection: "column" }}> */}
+        {/* <FiltersTab isEditMode={false} /> */}
+        <LocationsTab isEditMode={false} />
+        {/* </div> */}
+        <DataTab isEditMode={false} queryDataset={queryDataset} />
+      </div>
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "center",
+          paddingTop: "10px",
+        }}
+      >
+        <button
+          className={styles.downloadButton}
+          onClick={handleDownloadDataset}
+        >
+          <LsIcon
+            name={LsIconName.ArrowBottom}
+            color={LsColor.White}
+            size={"24px"}
+          />
+          <LsText size={LsFontSize.Sm}>Download via Earthdata Search</LsText>
+        </button>
+      </div>
+    </>
+  );
+
   return (
     <div style={{ display: "flex" }}>
       <div className={styles.panel}>
-        {/* Tabs */}
-        <div className={styles.tabs}>
-          {TABS.map((tab) => (
-            <button
-              key={tab}
-              className={`${styles.tabButton} ${
-                activeTab === tab ? styles.active : ""
-              }`}
-              onClick={() => handleTabClick(tab)}
-            >
-              <LsText
-                color={activeTab === tab ? LsColor.White : LsColor.Grey400}
-              >
-                {tab}
-              </LsText>
-            </button>
-          ))}
-        </div>
-
-        {/* Conditional content rendering based on the active tab */}
-        {activeTab === TABS[0] && <FiltersTab isEditMode={mode === "edit"} />}
-        {activeTab === TABS[1] && <LocationsTab isEditMode={mode === "edit"} />}
-        {activeTab === TABS[2] && (
-          <DataTab isEditMode={mode === "edit"} queryDataset={queryDataset} />
-        )}
-
-        {/* Footer with Download Button */}
-        {mode === "edit" && activeTab !== TABS[2] && (
-          <div
-            style={{
-              display: "flex",
-              justifyContent: "center",
-              paddingTop: "10px",
-            }}
-          >
-            {loading ? (
-              <LsIcon name={LsIconName.Processing} />
-            ) : (
-              <button
-                className={styles.queryButton}
-                onClick={handleQueryDataset}
-              >
-                <LsIcon
-                  name={LsIconName.Search}
-                  color={LsColor.White}
-                  size={"24px"}
-                />
-                <LsText>Query Dataset</LsText>
-              </button>
-            )}
-          </div>
-        )}
-        {mode === "read" && activeTab === TABS[2] && (
-          <div
-            style={{
-              display: "flex",
-              justifyContent: "center",
-              paddingTop: "10px",
-            }}
-          >
-            <button
-              className={styles.downloadButton}
-              onClick={handleDownloadDataset}
-            >
-              <LsIcon
-                name={LsIconName.ArrowBottom}
-                color={LsColor.White}
-                size={"24px"}
-              />
-              <LsText size={LsFontSize.Sm}>
-                Download via Earthdata Search
-              </LsText>
-            </button>
-          </div>
-        )}
+        {mode === "edit" ? renderEditMode() : renderReadMode()}
       </div>
       <div className={styles.bookmarks}>
         <button

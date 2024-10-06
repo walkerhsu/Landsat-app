@@ -8,7 +8,7 @@ import { NumberTickerComponent } from "../number-ticker";
 import { useSelector } from "react-redux";
 import { RootState } from "@/app/redux/store";
 import { SRDataDisplay } from "./bentoGrid";
-import { MarqueeSRData } from "./marquee";
+// import { MarqueeSRData } from "./marquee";
 
 // Example data for the bar chart
 const barChartData = [
@@ -19,7 +19,7 @@ const barChartData = [
 ];
 
 const FooterPanel: React.FC = () => {
-  const srData = useSelector((state: RootState) => state.srData.data)
+  const srData = useSelector((state: RootState) => state.srData.data);
   const [isOpen, setIsOpen] = useState(false);
 
   return (
@@ -40,7 +40,9 @@ const FooterPanel: React.FC = () => {
       {isOpen && (
         <div className={styles.panelContent}>
           {/* Title */}
-          <LsText>Statistics Panel</LsText>
+          <div style={{ marginBottom: "1rem" }}>
+            <LsText>Statistics Panel</LsText>
+          </div>
 
           {/* Statistics List */}
           {/* <MarqueeSRData sr_data={srData } /> */}

@@ -103,10 +103,6 @@ export const parsePersonModel = (model: PersonModel): Person => {
   };
 };
 
-// const initialPerson: Person = PersonModel.createMockPerson();
-
-// console.log(initialPerson);
-
 const personSlice = createSlice({
   name: "person",
   initialState: initialPerson,

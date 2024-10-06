@@ -2,7 +2,7 @@ import React from "react";
 import styles from "./profile.module.css";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faTimes } from "@fortawesome/free-solid-svg-icons";
-import Mapbox from "../../components/mapbox";
+import Mapbox from "../../containers/mapbox/mapbox";
 import { TLocation } from "@/types";
 
 interface MapModalProps {
