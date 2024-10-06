@@ -1,3 +1,3 @@
 from utils.firebase import db
-from utils.get_lansat_location import get_landsat_location
-from utils.get_lansat_location import next_landsat_time
+from backend.utils.get_landsat_location import get_landsat_location
+from backend.utils.get_landsat_location import next_landsat_time
