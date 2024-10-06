@@ -36,9 +36,7 @@ class LandsatGridAnalyzer:
                     "acquisition_date": ee.Date(image.get("system:time_start")).format(
                         "YYYY-MM-dd"
                     ),
-                    "injestion_date": ee.Date(image.get("system:time_end")).format(
-                        "YYYY-MM-dd"
-                    ),
+                    "acquisition_time": image.get("SCENE_CENTER_TIME"),
                     "collection": collection.get("system:id"),
                     "collection_name": collection_name,
                     "WRS_ROW": image.get("WRS_ROW"),
@@ -50,7 +48,7 @@ class LandsatGridAnalyzer:
 
     def get_datasetIDs(self, start_date, end_date):
         # print(start_date, end_date)
-        # start_date = "2024-10-04T00:00:00"
+        # start_date = "2024-09-29T00:00:00"
         # end_date = "2024-10-05T00:00:00"
         collections = [
             ee.ImageCollection(collection_name)
@@ -69,11 +67,14 @@ class LandsatGridAnalyzer:
         for feature in result["features"]:
             props = feature["properties"]
             collection_name = props["collection"]
+            acquisition_time = props["acquisition_time"][:8]
+            landsat_id = props["collection_name"].split("/")[1][-1]
             dataset_list.append(
                 {
                     "id": f"{props['collection_name']}/{props['id']}",
-                    "injestion_date": props["injestion_date"],
+                    "landsat_id": landsat_id,
                     "acquisition_date": props["acquisition_date"],
+                    "acquisition_time": acquisition_time,
                     "WRS_ROW": props["WRS_ROW"],
                     "WRS_PATH": props["WRS_PATH"],
                 }
