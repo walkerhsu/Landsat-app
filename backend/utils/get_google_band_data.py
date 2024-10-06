@@ -61,14 +61,16 @@ class LandsatGridAnalyzer:
         )
 
     def get_corners(self, datasetID, parsed_location: LatLng):
+        # print(datasetID)
         image = ee.Image(datasetID)
+        # print(image)
 
         image_data = self.get_image_info(image).getInfo()
         # Calculate 9 grid corners
         grid_corners, centers = self.calculate_grid_corners(
             image_data["properties"], parsed_location
         )
-        print(grid_corners)
+        # print(grid_corners)
         features = []
         all_SR_data = []
         is_cached = False
@@ -95,6 +97,7 @@ class LandsatGridAnalyzer:
             type="FeatureCollection",
             features=features
         )
+        print(geojson)
         return geojson
     
     def calculate_9_centers(self, image_props, center: LatLng):
@@ -117,7 +120,7 @@ class LandsatGridAnalyzer:
     def calculate_grid_corners(self, image_props, center: LatLng):
         # Create transformers based on the image CRS
         center_x, center_y, centers, pixel_size, image_to_wgs84 = self.calculate_9_centers(image_props, center)
-
+        print("center_x, center_y, centers, pixel_size")
         grid_corners = []
         for y in range(-1, 2):
             for x in range(-1, 2):

@@ -150,7 +150,7 @@ export default function Mapbox({ location, onLocationSelect }: IMapboxProps) {
       zoom: 18.5,
     });
     return null;
-  }, []);
+  }, [mapApi, setAllGeoJsons]);
 
   const allGeoJsonsData = useMemo(() => {
     // console.log("allGeoJsons: ", allGeoJsons);
@@ -177,6 +177,7 @@ export default function Mapbox({ location, onLocationSelect }: IMapboxProps) {
     // fetchGeoJson();
     console.log(selectedDataset);
     if (selectedDataset.datasetID.length && selectedDataset.location) {
+      console.log(selectedDataset.datasetID), 
       handleFetchGeoJson();
     }
   }, [selectedDataset]);

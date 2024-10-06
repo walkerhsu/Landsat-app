@@ -54,7 +54,6 @@ export class MapApi {
   ): Promise<[error: Error | null, geoJson: GeoJson | null]> {
     const data = { datasetID: datasetID, location: location };
     try {
-      console.log("inininnininininin", datasetID, location);
       const response = await fetch("/api/map/geojson", {
         method: "POST",
         headers: {
