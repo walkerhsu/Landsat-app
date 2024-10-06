@@ -11,6 +11,14 @@ export interface SR_data {
   nbr2: number; // Second Normalized Burn Ratio
   ndsi: number; // Normalized Difference Snow Index
   temperature: number; // Temperature in Kelvin
+  b1: number;
+  b2: number;
+  b3: number;
+  b4: number;
+  b5: number;
+  b6: number;
+  b7: number;
+  b8: number;
 }
 
 interface SRDataState {

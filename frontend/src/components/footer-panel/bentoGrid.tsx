@@ -4,19 +4,7 @@ import { cn } from "@/lib/utils";
 import { BentoCard, BentoGrid } from "@/components/magicui/bento-grid";
 import Marquee from "@/components/magicui/marquee";
 import { NoContentSection } from "../no-content-section";
-
-export interface SR_data {
-  color: string;
-  ndvi: number;
-  ndwi: number;
-  evi: number;
-  savi: number;
-  ndmi: number;
-  nbr: number;
-  nbr2: number;
-  ndsi: number;
-  temperature: number;
-}
+import { SR_data } from "@/app/redux/srData-slice";
 
 const mockSRData: SR_data = {
   color: "#FF5733", // Example color (Hex code)
@@ -29,6 +17,14 @@ const mockSRData: SR_data = {
   nbr2: 0.4, // NBR2 value
   ndsi: 0.1, // NDSI value
   temperature: 298.15, // Temperature in Kelvin
+  b1: 0.1,
+  b2: 0.1,
+  b3: 0.1,
+  b4: 0.1,
+  b5: 0.1,
+  b6: 0.1,
+  b7: 0.1,
+  b8: 0.1,
 };
 
 const descriptions = {
@@ -89,13 +85,12 @@ export const SRDataDisplay: React.FC<Props> = ({ srData = mockSRData }) => {
     ),
   }));
 
-  // const MarqueeFeatureDisplay = () => {
-    return (
-      <BentoGrid>
-        {features.map((feature, idx) => (
-          <BentoCard key={idx} {...feature} />
-        ))}
-      </BentoGrid>
-    );
+  return (
+    <BentoGrid>
+      {features.map((feature, idx) => (
+        <BentoCard key={idx} {...feature} />
+      ))}
+    </BentoGrid>
+  );
   // };
 };

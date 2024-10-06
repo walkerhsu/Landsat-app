@@ -25,6 +25,10 @@ export function LsIcon({ name, color = LsColor.White, size = "16px" }: Props) {
           fontSize={size}
         />
       );
+    case LsIconName.Back:
+      return (
+        <Icon icon="weui:back-filled" color={color} fontSize={size}></Icon>
+      );
     case LsIconName.Upload:
       return <Icon icon="prime:cloud-upload" color={color} fontSize={size} />;
     case LsIconName.Profile:

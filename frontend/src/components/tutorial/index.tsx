@@ -1,11 +1,14 @@
-// create a tutorial modal that will be displayed when the user clicks the tutorial button
-// the modal will have a close on the top right
-// the modal will have a title and a description
-// the modal will have a image
-// the modal will have a next / previous button
-// the modal will have a complete button
-import React, { useState } from 'react';
-import styles from './styles/tutorial.module.css';
+import React, { useState } from "react";
+import styles from "./styles/tutorial.module.css";
+import {
+  Pagination,
+  PaginationContent,
+  PaginationEllipsis,
+  PaginationItem,
+  PaginationLink,
+  PaginationNext,
+  PaginationPrevious,
+} from "@/components/magicui/pagination";
 
 interface TutorialStep {
   title: string;
@@ -16,7 +19,8 @@ interface TutorialStep {
 const tutorialSteps: TutorialStep[] = [
   {
     title: "Welcome to the Earth Pixel",
-    description: "This tutorial will guide you through the main features of our app.",
+    description:
+      "This tutorial will guide you through the main features of our app.",
     image: "/default_profile.jpg",
   },
   {
@@ -31,14 +35,15 @@ const tutorialSteps: TutorialStep[] = [
   },
   {
     title: "Show Surface Reflectance",
-    description: "Click on the pixel data to show the related surface reflectance data.",
+    description:
+      "Click on the pixel data to show the related surface reflectance data.",
     image: "/landsat_image.jpeg",
   },
-  // Add more steps as needed
 ];
 
 export default function Tutorial({ onClose }: { onClose: () => void }) {
   const [currentStep, setCurrentStep] = useState(0);
+
 
   const handleNext = () => {
     if (currentStep < tutorialSteps.length - 1) {
@@ -55,30 +60,41 @@ export default function Tutorial({ onClose }: { onClose: () => void }) {
   return (
     <div className={styles.modalOverlay}>
       <div className={styles.modal}>
-        <button className={styles.closeButton} onClick={onClose}>×</button>
+        <button className={styles.closeButton} onClick={onClose}>
+          ×
+        </button>
         <h2 className={styles.title}>{tutorialSteps[currentStep].title}</h2>
-        <img 
-          src={tutorialSteps[currentStep].image} 
-          alt={tutorialSteps[currentStep].title} 
+        <img
+          src={tutorialSteps[currentStep].image}
+          alt={tutorialSteps[currentStep].title}
           className={styles.image}
         />
-        <p className={styles.description}>{tutorialSteps[currentStep].description}</p>
-        <div className={styles.navigation}>
-          <button 
-            onClick={handlePrevious} 
-            disabled={currentStep === 0}
-            className={styles.navButton}
-          >
-            Previous
-          </button>
-          <button 
-            onClick={handleNext} 
-            disabled={currentStep === tutorialSteps.length - 1}
-            className={styles.navButton}
-          >
-            Next
-          </button>
-        </div>
+        <p className={styles.description}>
+          {tutorialSteps[currentStep].description}
+        </p>
+
+        <Pagination>
+          <PaginationContent>
+            <PaginationItem>
+              <PaginationPrevious onClick={handlePrevious} />
+            </PaginationItem>
+
+            {tutorialSteps.map((_, index) => (
+              <PaginationItem key={index}>
+                <PaginationLink
+                  onClick={() => setCurrentStep(index)}
+                  isActive={currentStep === index}
+                >
+                  {index + 1}
+                </PaginationLink>
+              </PaginationItem>
+            ))}
+
+            <PaginationItem>
+              <PaginationNext onClick={handleNext} />
+            </PaginationItem>
+          </PaginationContent>
+        </Pagination>
       </div>
     </div>
   );
