@@ -1,7 +1,7 @@
 from fastapi import APIRouter, HTTPException
 from user_data import Location
-from backend.utils.get_landsat_location import next_landsat_time
-from backend.utils.get_landsat_location import get_landsat_location
+from utils.get_landsat_location import next_landsat_time
+from utils.get_landsat_location import get_landsat_location
 from datetime import datetime
 
 timer_router = APIRouter()
