@@ -32,6 +32,8 @@ const DataTab: React.FC<DataProps> = ({ isEditMode, queryDataset }) => {
 
   const [searchTerm, setSearchTerm] = useState<string>("");
 
+  const [hovered, setHovered] = useState<string>("");
+
   // DOWNLOAD
   const handleDownloadDataset = useCallback(
     async (datasetLocation: DatasetLocation) => {
@@ -45,12 +47,10 @@ const DataTab: React.FC<DataProps> = ({ isEditMode, queryDataset }) => {
     [mapApi]
   );
 
-  const displayGridOnMap = (data: DatasetModel, location: TLocation) => {
-    console.log(
-      `displaying grid on map for ${data.getId()} on ${data.getDate()}`
-    );
+  const displayGridOnMap = (dataId: string, location: TLocation) => {
+    console.log(`displaying grid on map for ${dataId} on ${location}`);
     // selectedDataset
-    dispatch(setDatasetID(data.getId()));
+    dispatch(setDatasetID(dataId));
     dispatch(setLocation(location));
     // dispatch(setSource(data.source));
     // dispatch(setTime(data.time));
@@ -115,7 +115,11 @@ const DataTab: React.FC<DataProps> = ({ isEditMode, queryDataset }) => {
             // one location multiple data
             <div
               key={location.getDataset()?.[index]?.getId()}
-              className={styles.location}
+              style={
+                {
+                  // display: "flex",
+                }
+              }
             >
               <LsText>{location.getCollectionName()}</LsText>
               {/* <LsText size={LsFontSize.Sm}>{item.source}</LsText> */}
@@ -125,20 +129,29 @@ const DataTab: React.FC<DataProps> = ({ isEditMode, queryDataset }) => {
                     display: "flex",
                     alignItems: "flex-start",
                     gap: "1rem",
-                    padding: "10px 0px",
-                    cursor: "pointer  ",
+                    padding: "10px 10px",
+                    cursor: "pointer",
+                    background:
+                      hovered === data.getId()
+                        ? LsColor.Grey500
+                        : "transparent",
+                    borderRadius: "1rem",
                   }}
                   key={data.getId()}
-                  onClick={() => displayGridOnMap(data, location.getLocation())}
+                  onClick={() =>
+                    displayGridOnMap(data.getId(), location.getLocation())
+                  }
+                  onMouseEnter={() => setHovered(data.getId())}
+                  onMouseLeave={() => setHovered("")}
                 >
                   <LsText size={LsFontSize.Xs}>{data.getId()}</LsText>
+                  <LsText key={data.getId()} size={LsFontSize.Sm}>
+                    {data.getDate()}
+                  </LsText>
                   <LsCheckbox
                     checked={checkedDatasetId === data.getId()}
                     onChange={() => setCheckedDatasetId(data.getId())}
                   />
-                  <LsText key={data.getId()} size={LsFontSize.Sm}>
-                    {data.getDate()}
-                  </LsText>
                 </div>
               ))}
             </div>
