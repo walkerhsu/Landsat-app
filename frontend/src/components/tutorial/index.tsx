@@ -21,23 +21,23 @@ const tutorialSteps: TutorialStep[] = [
     title: "Welcome to the Earth Pixel",
     description:
       "This tutorial will guide you through the main features of our app.",
-    image: "/default_profile.jpg",
+    image: "1.jpg",
   },
   {
     title: "Location Panel",
     description: "Following the four steps can query the data you want.",
-    image: "/landsat_image.jpeg",
+    image: "2.jpg",
   },
   {
     title: "Geojson data",
     description: "Select the dataset you want to show on the map.",
-    image: "/default_profile.jpg",
+    image: "3.jpg",
   },
   {
     title: "Show Surface Reflectance",
     description:
       "Click on the pixel data to show the related surface reflectance data.",
-    image: "/landsat_image.jpeg",
+    image: "4.jpg",
   },
 ];
 
