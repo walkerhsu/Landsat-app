@@ -52,23 +52,23 @@ export const selectedDatasetSlice = createSlice({
     setLocation: (state, action: PayloadAction<TLocation>) => {
       state.location = action.payload;
     },
-    setSource: (state, action: PayloadAction<string>) => {
-      state.source = action.payload;
-    },
-    setTime: (state, action: PayloadAction<string>) => {
-      state.time = action.payload;
-    },
-    setAllFields: (state, action: PayloadAction<SelectedDatasetState>) => {
-      state.datasetID = action.payload.datasetID;
-      state.location = action.payload.location;
-      state.source = action.payload.source;
-      state.time = action.payload.time;
-    },
+    // setSource: (state, action: PayloadAction<string>) => {
+    //   state.source = action.payload;
+    // },
+    // setTime: (state, action: PayloadAction<string>) => {
+    //   state.time = action.payload;
+    // },
+    // setAllFields: (state, action: PayloadAction<SelectedDatasetState>) => {
+    //   state.datasetID = action.payload.datasetID;
+    //   state.location = action.payload.location;
+    //   state.source = action.payload.source;
+    //   state.time = action.payload.time;
+    // },
     resetDataset: (state) => {
       state.datasetID = "";
       state.location = { lat: 25.123456, lng: 121.654321 };
-      state.source = "";
-      state.time = "";
+      // state.source = "";
+      // state.time = "";
     },
   },
 });
@@ -76,9 +76,9 @@ export const selectedDatasetSlice = createSlice({
 export const {
   setDatasetID,
   setLocation,
-  setSource,
-  setTime,
-  setAllFields,
+  // setSource,
+  // setTime,
+  // setAllFields,
   resetDataset,
 } = selectedDatasetSlice.actions;
 

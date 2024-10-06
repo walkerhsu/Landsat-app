@@ -8,7 +8,7 @@ import { MapMouseEvent } from "mapbox-gl";
 import MapGL from "react-map-gl";
 import mapboxgl from "mapbox-gl";
 import MapboxGeocoder from "@mapbox/mapbox-gl-geocoder";
-import { TLocation } from "../types";
+import { TLocation } from "../../types";
 import { dataLayer } from "./map-style";
 import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "@/app/redux/store";
@@ -16,8 +16,8 @@ import { GeoJson } from "@/app/redux/selectedDataset-slice";
 import { mockGeoJson } from "./map-geojson";
 import { setViewport } from "@/app/redux/current-viewport-slice";
 import { MapApi } from "@/apis/map-api";
-import { SkeletonCard } from "./skeleton-card";
-import { calcGeoJson } from "./utils/calc-geojson";
+import { SkeletonCard } from "../../components/skeleton-card";
+import { calcGeoJson } from "../utils/calc-geojson";
 import { setSRData } from "@/app/redux/srData-slice";
 
 const MAPBOX_TOKEN = process.env.NEXT_PUBLIC_MAPBOX_TOKEN!;
@@ -129,6 +129,8 @@ export default function Mapbox({ location, onLocationSelect }: IMapboxProps) {
   };
 
   const handleFetchGeoJson = useCallback(async () => {
+    console.log(selectedDataset);
+    if (!selectedDataset) return;
     const [error, returnedGeoJson] = await mapApi.fetchGeoJson(
       selectedDataset.datasetID,
       selectedDataset.location
@@ -144,7 +146,7 @@ export default function Mapbox({ location, onLocationSelect }: IMapboxProps) {
       zoom: 18.5,
     });
     return null;
-  }, [mapApi, selectedDataset, setAllGeoJsons, handleViewportChange]);
+  }, []);
 
   const allGeoJsonsData = useMemo(() => {
     // console.log("allGeoJsons: ", allGeoJsons);
@@ -169,7 +171,10 @@ export default function Mapbox({ location, onLocationSelect }: IMapboxProps) {
     // console.log(selectedDataset);
     // setAllData([mockGeoJson]);
     // fetchGeoJson();
-    handleFetchGeoJson();
+    console.log(selectedDataset)
+    if (selectedDataset.datasetID.length && selectedDataset.location) {
+      handleFetchGeoJson();
+    }
   }, [selectedDataset]);
 
   return (

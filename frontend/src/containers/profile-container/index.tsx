@@ -107,19 +107,33 @@ const PersonProfile: React.FC<Props> = ({ currentTab }) => {
     console.log("Profile successfully saved");
   }, [draftUserProfile, profileApi, handlefetchUserProfile]);
 
-  const handleDeleteLocation = React.useCallback(
-    (locationToDelete: LocationModel) => {
+  const handleDeleteLocation = useCallback(
+    async (locationToDelete: LocationModel) => {
+      console.log(
+        "Delete location's locationId: ",
+        locationToDelete.getId(),
+        draftUserProfile
+      );
       if (!draftUserProfile) {
         return;
       }
-      setDraftUserProfile((prev) => {
-        if (!prev) return null;
-        const updatedProfile = prev.clone();
-        updatedProfile.updateLocationHistory(locationToDelete);
-        return updatedProfile;
-      });
+      draftUserProfile.removeLocationHistory(locationToDelete.getId());
+      let [error, status] = await profileApi.updateProfile(draftUserProfile);
+      if (error) {
+        console.error("Failed to update profile");
+        return;
+      }
+      if (userProfile) {
+        dispatch(setEditablePerson(parsePersonModel(draftUserProfile)));
+      }
+      console.log("Profile successfully deleted");
+      error = await handlefetchUserProfile(draftUserProfile.getId());
+      if (error) {
+        console.error("Failed to save profile");
+        return;
+      }
     },
-    []
+    [draftUserProfile, profileApi, handlefetchUserProfile]
   );
 
   const handleNameChange = React.useCallback(

@@ -4,14 +4,12 @@ import { useSelector } from "react-redux";
 import { RootState } from "@/app/redux/store";
 import { Suspense, useEffect, useMemo, useState } from "react";
 import styles from "./page.module.css";
-import Mapbox from "@/components/mapbox";
 import FooterPanel from "@/components/footer-panel/footerPanel";
 import ExpandableButton from "@/containers/expandable-fab";
 import Panel from "@/containers/landsat-panel/panel";
 import { useUser } from "@clerk/nextjs";
 import { ProfileApi } from "@/apis/profile-api";
-import { PersonModel } from "@/models/person-model";
-import { formatDate } from "@/lib/utils";
+import Mapbox from "@/containers/mapbox/mapbox";
 
 const MainContent = () => {
   const profileApi = useMemo(() => ProfileApi.create(), []);
