@@ -24,6 +24,7 @@ import { ProfileApi } from "@/apis/profile-api";
 import { PersonModel } from "@/models/person-model";
 // import { mockPerson } from "@/app/redux/info";
 import { LocationModel } from "@/models/location-model";
+import ReportPage from "./report";
 
 const tabs = [
   { id: "overview", label: "Overview" },
@@ -550,6 +551,14 @@ const PersonProfile: React.FC<Props> = ({ currentTab }) => {
               </div>
             </div>
           </TabsContent>
+          
+          
+        )}
+
+        {draftUserProfile && (
+          <TabsContent value="report">
+          <ReportPage />
+        </TabsContent>
         )}
       </Tabs>
     </div>
