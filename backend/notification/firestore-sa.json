@@ -1,0 +1,13 @@
+{
+  "type": "service_account",
+  "project_id": "nasa-hackathon-2024",
+  "private_key_id": "83ad05766753de487d8e3bed436fa2ab68c287db",
+  "private_key": "-----BEGIN PRIVATE KEY-----\nMIIEvAIBADANBgkqhkiG9w0BAQEFAASCBKYwggSiAgEAAoIBAQDRD4HX19zNbScX\n+3+GqF7UGqCdPpKIfAvm/YvuE39BulLfr8fg0uWQiQOzKHNo5IZKbisBPpZDI1CA\nMAmByW7p0Cz+q900lVDNfaqcAuLxgIENZQhU4XIlMvQwxUIjHFhqynF6GV+3s5eK\nNWePyFzarGfvVm7Res1A5M2bSPHL/4HuFbo4d032YJquXbsBZpFDbjBLKcJEhN0s\nl80norlrJVft49xJcGvr0rXa2L4rdLHdXZQ42K8tzwQIEh7Vv+lhJ6+MdmT4MmMV\nArA+gH1MDAIPch30b9CashcdR9vFbVbTj4PebDN0zky4yDXbYTR6zpcMsq9EM/PA\nmwcn4FaLAgMBAAECggEAAmiOU2E+PvOZ9rHEB1YbOZBQ917IK2Badr/HA+gfmC9A\nUylgQRvM3zxk2YSGx9eSIHtibXI+IunePIvRIDik2Xa3ffuW4csykht3grKZ0LRt\nSC04ylmKihkrLQCowWTLM/e/FOwD6UbdYQ86cTKatz4zOFOjlTA3+x5nq/lMJ9B1\nZb2iSKyTKfhsFMAVhDcrbSckrq2w3RYcuJ5tGXlY0iDaKDxQ40sjFHcdnP/6nprk\nskFcJc8Uf4uIaysFST8SBsvGw9baA21VgPLFvqUFh23u7H11vYrNskwvnxNuyEB1\nBOh5KaGbjwYlBIlElM5pjK3lS1yZfr2augVpLhR9MQKBgQDyL1BpZ5XC+5V/Nxk6\nfMkRPCGuby83eP4uaoGlNx4zYGd4seqvXQnwZiFoR6cSTl0Rqnj+Jwz+O3JRLSUP\nO1RvfAEIVgw/1xweXgAA4tALoZy54uNdzEuZlT2giZWPtE29vQ1NIZQHSDPSl4Dx\nvp2L5n8b8q3xDA+FVHJiCQeuSQKBgQDc/HitR0PtzdZHfKMDTG+B9B4cMqef5KAt\nqZ+TdZ813A994/44PsldesajUjr0kPdPycLhoCEIjfxqDlDu9jALveKl/JAr0PKw\ncb75eUSPWersexeoa8WIXVCMhyHmc7ZkvzMvlOlmnqHsKqzytbA18RDC5dZWr80h\nlHY5d8uuMwKBgBHvCQBVKFTg9mgON3MKTIVXM5NMLm3oKsJbJrCKTVU2nVLlseA8\nfoDrvyuOqsODRAcL3ZvMXnzw//0c37KqDQ2YXCc23/9WOYHSKiPmp8tEs2tcbsPC\nXhLIZ2Dc71NN4bfcKQD+LI0BfrzodSbxm48BiYYTSWghIYEZCMNTsdrpAoGAKrZV\nsNA0bfM59mk9rLaKWujPJQ4ZXgs3dnvxjvPOCP/2spNtoHtqOjovyINtR7X5Rx+t\nHiTwHZIr9me79uP4l1xlQUXWq9FgBwCFM/zfZoGvqXOFOBVUga3fkrnPsJYu67wU\n7Z5vmlkQ3O/Gq8a4P0TPw4ve6LRkBpiGXUctRAcCgYBPZ/vaZFZc9zCWxn25QtqL\n+oyfQkqhgh6uD0AJ17L8hISWq754RDNXzxEC2VOMoKLQ+MfpXMjn4O13HYf7E5vd\nrc6wag3EWeqWlo4PXMm7u/E6dr9XIeMSvRQRAQ+rKgME7SuTNVfawMhwT0JsmqR7\nTXT+xVgl2pbH5nBUwCvN4w==\n-----END PRIVATE KEY-----\n",
+  "client_email": "firebase-adminsdk-tvtxt@nasa-hackathon-2024.iam.gserviceaccount.com",
+  "client_id": "107728571319406663698",
+  "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+  "token_uri": "https://oauth2.googleapis.com/token",
+  "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+  "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/firebase-adminsdk-tvtxt%40nasa-hackathon-2024.iam.gserviceaccount.com",
+  "universe_domain": "googleapis.com"
+}
