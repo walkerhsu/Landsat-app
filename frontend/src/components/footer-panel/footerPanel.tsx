@@ -9,6 +9,7 @@ import { useSelector } from "react-redux";
 import { RootState } from "@/app/redux/store";
 import { SRDataDisplay } from "./bentoGrid";
 import SpectrumChart from "@/containers/graph";
+import { SR_data } from "@/app/redux/srData-slice";
 // import { MarqueeSRData } from "./marquee";
 
 // Example data for the bar chart
@@ -18,6 +19,19 @@ const barChartData = [
   { label: "C", value: 5 },
   { label: "D", value: 8 },
 ];
+
+const mockSRData: SR_data = {
+  color: "#FF5733", // Example color (Hex code)
+  ndvi: 0.78, // NDVI value
+  ndwi: 0.62, // NDWI value
+  evi: 0.55, // EVI value
+  savi: 0.72, // SAVI value
+  ndmi: 0.45, // NDMI value
+  nbr: 0.6, // NBR value
+  nbr2: 0.4, // NBR2 value
+  ndsi: 0.1, // NDSI value
+  temperature: 298.15, // Temperature in Kelvin
+};
 
 const FooterPanel: React.FC = () => {
   const srData = useSelector((state: RootState) => state.srData.data);
@@ -49,8 +63,9 @@ const FooterPanel: React.FC = () => {
           </div>
 
           {/* Statistics List */}
+        
           {/* <MarqueeSRData sr_data={srData } /> */}
-          <SRDataDisplay srData={srData!} />
+          <SRDataDisplay srData={mockSRData }/>
           {/* <div style={{display: 'flex', margin: '1rem 0', gap: '1rem'}}>
             <LsText>NDVI:</LsText>
             <NumberTickerComponent value={0.45} />
@@ -78,7 +93,7 @@ const FooterPanel: React.FC = () => {
               }
             }
           >
-            <SpectrumChart></SpectrumChart>
+            {/* <SpectrumChart></SpectrumChart> */}
           </div>
 
           {/* More Statistics */}

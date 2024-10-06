@@ -89,7 +89,7 @@ export const SRDataDisplay: React.FC<Props> = ({ srData = mockSRData }) => {
     ),
   }));
 
-  const MarqueeFeatureDisplay = () => {
+  // const MarqueeFeatureDisplay = () => {
     return (
       <BentoGrid>
         {features.map((feature, idx) => (
@@ -97,5 +97,5 @@ export const SRDataDisplay: React.FC<Props> = ({ srData = mockSRData }) => {
         ))}
       </BentoGrid>
     );
-  };
+  // };
 };

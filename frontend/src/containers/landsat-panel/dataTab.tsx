@@ -79,6 +79,8 @@ const DataTab: React.FC<DataProps> = ({ isEditMode, queryDataset }) => {
         formatLocationId(dataset.getLocation().lat, dataset.getLocation().lng)
       );
     });
+    console.log('filltered: ', filterByLocation);
+    console.log(removeDuplicateDatasets(filterByLocation))
 
     setUniqueFilteredDatasets(removeDuplicateDatasets(filterByLocation));
 

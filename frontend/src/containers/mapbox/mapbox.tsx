@@ -14,7 +14,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "@/app/redux/store";
 import { GeoJson } from "@/app/redux/selectedDataset-slice";
 import { mockGeoJson } from "./map-geojson";
-import Feature  from "react-map-gl";
+import Feature from "react-map-gl";
 import { setViewport } from "@/app/redux/current-viewport-slice";
 import { MapApi } from "@/apis/map-api";
 import { SkeletonCard } from "../../components/skeleton-card";
@@ -114,7 +114,6 @@ export default function Mapbox({ location, onLocationSelect }: IMapboxProps) {
   };
 
   const [allGeoJsons, setAllGeoJsons] = useState<GeoJson | null>(null);
-  // const [allData, setAllData] = useState<GeoJson[] | null>(null);
 
   const handleMapClick = (event: MapMouseEvent) => {
     const { lng, lat } = event.lngLat;
@@ -150,34 +149,21 @@ export default function Mapbox({ location, onLocationSelect }: IMapboxProps) {
       zoom: 18.5,
     });
     return null;
-  }, [mapApi, setAllGeoJsons]);
+  }, [mapApi, setAllGeoJsons, selectedDataset]);
 
   const allGeoJsonsData = useMemo(() => {
     // console.log("allGeoJsons: ", allGeoJsons);
     return allGeoJsons;
   }, [allGeoJsons]);
 
-  // const fetchGeoJson = async () => {
-  //   try {
-  //     const response = await fetch(
-  //       'https://raw.githubusercontent.com/uber/react-map-gl/master/examples/.data/us-income.geojson'
-  //     );
-  //     const json = await response.json();
-  //     setAllData(json);
-  //   } catch (error) {
-  //     console.error('Could not load data', error);
-  //   }
-  // }
-
-  // const data = mockGeoJson
-
   useEffect(() => {
-    // console.log(selectedDataset);
-    // setAllData([mockGeoJson]);
-    // fetchGeoJson();
     console.log(selectedDataset);
-    if (selectedDataset.datasetID.length && selectedDataset.location) {
-      console.log(selectedDataset.datasetID), 
+    if (
+      mapRef.current &&
+      selectedDataset.datasetID.length &&
+      selectedDataset.location
+    ) {
+      console.log(selectedDataset.datasetID);
       handleFetchGeoJson();
     }
   }, [selectedDataset]);
