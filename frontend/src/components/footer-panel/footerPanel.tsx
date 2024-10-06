@@ -8,6 +8,7 @@ import { NumberTickerComponent } from "../number-ticker";
 import { useSelector } from "react-redux";
 import { RootState } from "@/app/redux/store";
 import { SRDataDisplay } from "./bentoGrid";
+import SpectrumChart from "@/containers/graph";
 // import { MarqueeSRData } from "./marquee";
 
 // Example data for the bar chart
@@ -23,7 +24,10 @@ const FooterPanel: React.FC = () => {
   const [isOpen, setIsOpen] = useState(false);
 
   return (
-    <div className={`${styles.footerPanel} ${isOpen ? "" : styles.collapsed}`}>
+    <div
+      className={`${styles.footerPanel} ${isOpen ? "" : styles.collapsed}`}
+      onClick={() => setIsOpen(!isOpen)}
+    >
       <div className={styles.toggleButtonContainer}>
         <button
           onClick={() => setIsOpen(!isOpen)}
@@ -59,6 +63,22 @@ const FooterPanel: React.FC = () => {
           {/* D3 Bar Chart */}
           <div className={styles.graphContainer}>
             {/* <D3BarChart data={barChartData} width={600} height={300} /> */}
+          </div>
+
+          <div
+            style={
+              {
+                // borderColor: "#FFFFFF",
+                // width: "275px",
+                // // backgroundColor: "rgba(40, 40, 40, 0.85)",
+                // borderRadius: "10px",
+                // position: "absolute",
+                // zIndex: "10",
+                // padding: "10px",
+              }
+            }
+          >
+            <SpectrumChart></SpectrumChart>
           </div>
 
           {/* More Statistics */}

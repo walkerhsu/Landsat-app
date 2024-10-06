@@ -12,7 +12,6 @@ import { ProfileApi } from "@/apis/profile-api";
 import Mapbox from "@/containers/mapbox/mapbox";
 import CountdownTimer  from "@/containers/notification_panel";
 import Graph from "@/containers/graph";
-import SpectrumChart from "@/containers/graph";
 
 const MainContent = () => {
   const profileApi = useMemo(() => ProfileApi.create(), []);
@@ -77,16 +76,7 @@ const MainContent = () => {
       }>
         <CountdownTimer />
       </div>
-
-      <div style={
-        {borderColor:"#FFFFFF", width:"275px",  
-          backgroundColor: "rgba(40, 40, 40, 0.85)", 
-          borderRadius: "10px", position: "absolute", zIndex: "10", padding: "10px"}
-      }>
-        <SpectrumChart></SpectrumChart>
-      </div>
-
-
+      
       <div
         style={{ position: "fixed", right: "1vw", top: "1vh", zIndex: "10" }}
       >
