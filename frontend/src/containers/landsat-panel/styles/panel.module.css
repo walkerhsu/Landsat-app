@@ -2,7 +2,7 @@
   display: flex;
   flex-direction: column;
   /* width: 100%; */
-  max-width: 50rem;
+  max-width: 30rem;
   max-height: 50rem;
   background-color: rgba(40, 40, 40, 0.85);
   /* border: 1px solid #ccc; */
@@ -113,22 +113,4 @@
 
 .queryButton:hover {
   background-color: var(--steel-blue);
-}
-
-.downloadButton {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  gap: 0.5em;
-  background-color: var(--dark-pink);
-  color: white;
-  padding: 10px;
-  border: none;
-  cursor: pointer;
-  font-size: 14px;
-  border-radius: 10px;
-}
-
-.downloadButton:hover {
-  background-color: var(--pink);
 }

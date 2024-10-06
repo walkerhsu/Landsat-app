@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 import styles from "./styles/panel.module.css";
 import DataTab from "./dataTab";
 import LocationsTab from "./locationsTab";
@@ -22,6 +22,12 @@ const Panel: React.FC = () => {
   const [mode, setMode] = useState<"edit" | "read">("edit");
   const [queryDataset, setQueryDataset] = useState<MapModel[]>([]);
   const [loading, setLoading] = useState(false);
+
+  const [panelWidth, setPanelWidth] = useState("17rem");
+
+  useEffect(() => {
+    setPanelWidth(mode === "edit" ? "17rem" : "40rem");
+  }, [mode]);
 
   const handleTabClick = (tab: string) => {
     if (mode === "edit") {
@@ -59,10 +65,6 @@ const Panel: React.FC = () => {
     toggleMode("read");
   }, [mapApi, dataAttributes, setQueryDataset, toggleMode]);
 
-  const handleDownloadDataset = () => {
-    console.log("Downloading dataset...");
-  };
-
   const renderEditMode = () => (
     <>
       <div className={styles.tabs}>
@@ -82,9 +84,6 @@ const Panel: React.FC = () => {
       </div>
       {activeTab === TABS[0] && <FiltersTab isEditMode={true} />}
       {activeTab === TABS[1] && <LocationsTab isEditMode={true} />}
-      {/* {activeTab === TABS[2] && (
-        <DataTab isEditMode={true} queryDataset={queryDataset} />
-      )} */}
       <div
         style={{
           display: "flex",
@@ -93,8 +92,8 @@ const Panel: React.FC = () => {
         }}
       >
         {loading ? (
-          <LsIcon name={LsIconName.Processing} />
-        ) : (
+          <LsIcon name={LsIconName.Processing} size="20px" />
+        ) : activeTab === TABS[1] ? (
           <button className={styles.queryButton} onClick={handleQueryDataset}>
             <LsIcon
               name={LsIconName.Search}
@@ -103,7 +102,7 @@ const Panel: React.FC = () => {
             />
             <LsText>Query Dataset</LsText>
           </button>
-        )}
+        ) : null}
       </div>
     </>
   );
@@ -114,47 +113,37 @@ const Panel: React.FC = () => {
       <div
         style={{
           display: "grid",
-          width: "45vw",
-          height: '50vh',
+          maxWidth: "45vw",
+          maxHeight: "50vh",
           padding: `${8}px`,
           gridTemplateColumns: `repeat(${2}, 1fr)`,
           flexFlow: "column wrap",
           gap: `${24}px`,
-          overflow: 'auto',
+          overflow: "auto",
           overflowWrap: "break-word",
         }}
       >
         {/* <div style={{ display: "flex", flexDirection: "column" }}> */}
         {/* <FiltersTab isEditMode={false} /> */}
-        <LocationsTab isEditMode={false} />
-        {/* </div> */}
-        <DataTab isEditMode={false} queryDataset={queryDataset} />
-      </div>
-      <div
-        style={{
-          display: "flex",
-          justifyContent: "center",
-          paddingTop: "10px",
-        }}
-      >
-        <button
-          className={styles.downloadButton}
-          onClick={handleDownloadDataset}
-        >
-          <LsIcon
-            name={LsIconName.ArrowBottom}
-            color={LsColor.White}
-            size={"24px"}
-          />
-          <LsText size={LsFontSize.Sm}>Download via Earthdata Search</LsText>
-        </button>
+        <div style={{ display: "flex", flexBasis: "50%" }}>
+          <LocationsTab isEditMode={false} />
+        </div>
+        <div style={{ display: "flex", flexBasis: "50%" }}>
+          <DataTab isEditMode={false} queryDataset={queryDataset} />
+        </div>
       </div>
     </>
   );
 
   return (
     <div style={{ display: "flex" }}>
-      <div className={styles.panel}>
+      <div
+        className={styles.panel}
+        style={{
+          width: panelWidth,
+          transition: "width 0.3s ease-in-out",
+        }}
+      >
         {mode === "edit" ? renderEditMode() : renderReadMode()}
       </div>
       <div className={styles.bookmarks}>

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 import styles from "./styles/tab.module.css";
 import { LsText } from "@/components/LsText";
 import { LsFontSize } from "@/constants/ls-fonts";
@@ -11,6 +11,11 @@ import { setDatasetID, setLocation } from "@/app/redux/selectedDataset-slice";
 import { MapModel } from "@/models/map-model";
 import { DatasetModel } from "@/models/dataset-model";
 import { TLocation } from "@/types";
+import { formatLocationId, parseLocationId } from "../utils/format-locations";
+import { LsIconName } from "@/constants/ls-icon";
+import { LsIcon } from "@/components/LsIcon";
+import { LsColor } from "@/constants/ls-color";
+import { DatasetLocation, MapApi } from "@/apis/map-api";
 
 type DataProps = {
   isEditMode: boolean;
@@ -18,34 +23,27 @@ type DataProps = {
 };
 
 const DataTab: React.FC<DataProps> = ({ isEditMode, queryDataset }) => {
-  // const dataAttribute = useSelector((state: RootState) => state.dataAttribute);
+  const mapApi = useMemo(() => new MapApi(), []);
+  const checkedItems = useSelector(
+    (state: RootState) => state.checkedItems.checkedItems
+  );
   const dispatch = useDispatch();
-  const [selectedOptions, setSelectedOptions] = useState<{
-    [key: string]: string;
-  }>({});
+  const [checkedDatasetId, setCheckedDatasetId] = useState<string | null>(null);
+
   const [searchTerm, setSearchTerm] = useState<string>("");
 
-  const handleOptionChange = (category: string, option: string) => {
-    setSelectedOptions((prev) => ({ ...prev, [category]: option }));
-  };
-
-  // READ
-  // const filteredItems = ITEMS.filter((item) => {
-  //   const matchesCategory = item.category
-  //     .toLowerCase()
-  //     .includes(dataAttribute.datasetName.toLowerCase());
-  //   const matchesLocation = dataAttribute.locations.some((location) =>
-  //     item.location.toLowerCase().includes(location.toLowerCase())
-  //   );
-  //   return matchesCategory && matchesLocation;
-  // });
-
-  // const handleFilteredItems = (items: typeof ITEMS) => {
-  //   console.log("Filtered Items:", items);
-  //   return items;
-  // };
-
-  // const filteredDataset = handleFilteredItems(filteredItems);
+  // DOWNLOAD
+  const handleDownloadDataset = useCallback(
+    async (datasetLocation: DatasetLocation) => {
+      console.log("Downloading dataset...");
+      const error = await mapApi.downloadDataset(datasetLocation);
+      if (error) {
+        return;
+      }
+      console.log("Successfully downloaded dataset");
+    },
+    [mapApi]
+  );
 
   const displayGridOnMap = (data: DatasetModel, location: TLocation) => {
     console.log(
@@ -57,13 +55,42 @@ const DataTab: React.FC<DataProps> = ({ isEditMode, queryDataset }) => {
     // dispatch(setSource(data.source));
     // dispatch(setTime(data.time));
   };
+  const [uniqueFilteredDatasets, setUniqueFilteredDatasets] = useState<
+    MapModel[] | null
+  >(null);
+
+  useEffect(() => {
+    function removeDuplicateDatasets(datasets: MapModel[]): MapModel[] {
+      const uniqueDatasets = new Map<string, MapModel>();
+
+      datasets.forEach((mapModel) => {
+        mapModel.getDataset().forEach((dataset) => {
+          if (!uniqueDatasets.has(dataset.getId())) {
+            uniqueDatasets.set(dataset.getId(), mapModel);
+          }
+        });
+      });
+
+      return Array.from(uniqueDatasets.values());
+    }
+
+    const filterByLocation = queryDataset.filter((dataset) => {
+      return checkedItems.includes(
+        formatLocationId(dataset.getLocation().lat, dataset.getLocation().lng)
+      );
+    });
+
+    setUniqueFilteredDatasets(removeDuplicateDatasets(filterByLocation));
+
+    console.log(queryDataset, uniqueFilteredDatasets, checkedItems);
+  }, [checkedItems]);
 
   return (
     <div
       style={{
         display: "flex",
         flexFlow: "column",
-        width: "100%",
+        width: "24vw",
         height: "100%",
       }}
     >
@@ -75,35 +102,39 @@ const DataTab: React.FC<DataProps> = ({ isEditMode, queryDataset }) => {
         onChange={(e) => setSearchTerm(e.target.value)}
         className={styles.searchInput}
       />
-      <div style={{ flexGrow: "1", maxHeight: "25rem", overflowY: "auto" }}>
-        {queryDataset.length > 0 ? (
-          queryDataset.map((item) => (
-            <div key={item.getDataset()?.[0]?.getId()} className={styles.item}>
-              <LsText>{item.getCollectionName()}</LsText>
+      <div
+        style={{
+          flexGrow: "1",
+          maxWidth: "50rem",
+          maxHeight: "25rem",
+          overflowY: "auto",
+        }}
+      >
+        {uniqueFilteredDatasets && uniqueFilteredDatasets.length > 0 ? (
+          uniqueFilteredDatasets.map((location, index) => (
+            // one location multiple data
+            <div
+              key={location.getDataset()?.[index]?.getId()}
+              className={styles.location}
+            >
+              <LsText>{location.getCollectionName()}</LsText>
               {/* <LsText size={LsFontSize.Sm}>{item.source}</LsText> */}
-              {item.getDataset().map((data) => (
+              {location.getDataset().map((data) => (
                 <div
                   style={{
                     display: "flex",
-                    alignItems: "center",
+                    alignItems: "flex-start",
                     gap: "1rem",
                     padding: "10px 0px",
                     cursor: "pointer  ",
                   }}
                   key={data.getId()}
-                  onClick={() => displayGridOnMap(data, item.getLocation())}
+                  onClick={() => displayGridOnMap(data, location.getLocation())}
                 >
+                  <LsText size={LsFontSize.Xs}>{data.getId()}</LsText>
                   <LsCheckbox
-                    checked={
-                      selectedOptions[item.getCollectionName()] ===
-                      data.getDate()
-                    }
-                    onChange={() =>
-                      handleOptionChange(
-                        item.getCollectionName(),
-                        data.getDate()
-                      )
-                    }
+                    checked={checkedDatasetId === data.getId()}
+                    onChange={() => setCheckedDatasetId(data.getId())}
                   />
                   <LsText key={data.getId()} size={LsFontSize.Sm}>
                     {data.getDate()}
@@ -115,6 +146,32 @@ const DataTab: React.FC<DataProps> = ({ isEditMode, queryDataset }) => {
         ) : (
           <NoContentSection message="There is no data found" />
         )}
+
+        <div
+          style={{
+            // width: "30rem",
+            display: "flex",
+            justifyContent: "center",
+            paddingTop: "10px",
+          }}
+        >
+          <button
+            className={styles.downloadButton}
+            onClick={() =>
+              handleDownloadDataset({
+                datasetID: checkedDatasetId!,
+                location: parseLocationId(checkedItems[0]),
+              })
+            }
+          >
+            <LsIcon
+              name={LsIconName.ArrowBottom}
+              color={LsColor.White}
+              size={"24px"}
+            />
+            <LsText size={LsFontSize.Sm}>Download via Earthdata Search</LsText>
+          </button>
+        </div>
       </div>
     </div>
   );

@@ -4,7 +4,7 @@ import { MapModel } from "@/models/map-model";
 import { GeoJson } from "@/app/redux/selectedDataset-slice";
 import { CloudCoverage } from "@/app/redux/dataAttribute-slice";
 
-interface DatasetLocation {
+export interface DatasetLocation {
   datasetID: string;
   location: TLocation;
 }
@@ -54,7 +54,7 @@ export class MapApi {
   ): Promise<[error: Error | null, geoJson: GeoJson | null]> {
     const data = { datasetID: datasetID, location: location };
     try {
-      console.log("inininnininininin", datasetID, location)
+      console.log("inininnininininin", datasetID, location);
       const response = await fetch("/api/map/geojson", {
         method: "POST",
         headers: {
@@ -89,27 +89,38 @@ export class MapApi {
         body: JSON.stringify(data),
       });
 
-      if (!response.ok) {
-        throw new Error(`Failed to download: ${response.statusText}`);
-      }
-
       const { file, filename } = await response.json();
 
-      if (response.ok) {
-        const blob = await file.blob();
+      if (file && filename) {
+        console.log("Downloading file: " + filename);
+
+        // Assuming the file is a base64 encoded string
+        const byteCharacters = atob(file);
+        console.log(byteCharacters);
+        const byteNumbers = new Array(byteCharacters.length);
+        for (let i = 0; i < byteCharacters.length; i++) {
+          byteNumbers[i] = byteCharacters.charCodeAt(i);
+        }
+        const byteArray = new Uint8Array(byteNumbers);
+        const blob = new Blob([byteArray], {
+          type: "application/octet-stream",
+        });
+
         const url = window.URL.createObjectURL(blob);
         const link = document.createElement("a");
         link.href = url;
-        link.setAttribute("download", `${filename}`);
+        link.setAttribute("download", filename);
         document.body.appendChild(link);
         link.click();
         link.remove();
+
+        // Clean up the URL object
+        window.URL.revokeObjectURL(url);
+
         console.log("Successfully downloaded file");
         return null;
       } else {
-        const { detail } = (await response.json()) as { detail: string };
-        console.error("Failed to download file");
-        return new Error(detail);
+        throw new Error("File data or filename is missing in the response");
       }
     } catch (error: any) {
       return new Error(error.message);
