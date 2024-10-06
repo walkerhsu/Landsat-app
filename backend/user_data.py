@@ -26,12 +26,27 @@ class CloudCoverage(BaseModel):
     min: float
     max: float
 
+
+class SR_data(BaseModel):
+    color: list[int]
+    ndvi: float
+    ndwi: float
+    evi: float
+    savi: float
+    ndmi: float
+    nbr: float
+    nbr2: float
+    ndsi: float
+    temperature: float
+
+
 class Location(BaseModel):
     place: str
     latlng: LatLng
     dataset: str
     addedDate: str
-    
+
+
 class Detail(BaseModel):
     label: str
     field: str
